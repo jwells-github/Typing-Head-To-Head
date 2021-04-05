@@ -30,11 +30,24 @@ class App extends Component {
       event.target.style.background = "white"
     }
   }
-  
   render(){
+    const wordList = [];
+    for(var i = 0; i < this.state.words.length; i++){
+      let itemClass = "word "
+      if(i < this.state.currentPosition ){
+        itemClass += "completedWord"
+      }
+      else if(i === this.state.currentPosition ){
+        itemClass += "currentWord"
+      }
+      wordList.push(<li className={itemClass} key={i}>{this.state.words[i]}</li>)
+    }
     return (
       <div className="App">
         <div>
+          <ul>
+            {wordList}
+          </ul>
           <h1>{this.state.words[this.state.currentPosition]}</h1>
         </div>
         <div>

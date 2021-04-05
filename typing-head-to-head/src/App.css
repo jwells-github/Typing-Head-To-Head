@@ -1,3 +1,16 @@
+.word{
+  display:inline-block;
+  padding:4px;
+}
+
+.completedWord{
+  color:greenyellow
+}
+
+.currentWord{
+  border-bottom: 1px dotted black;
+}
+
 .App {
   text-align: center;
 }
