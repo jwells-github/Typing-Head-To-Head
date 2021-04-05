@@ -6,20 +6,37 @@ class App extends Component {
     super(props);
     this.state = {
       words: ["The","big","dog","named","Dave","ate","sausages!"],
-      currentPosition : 0
+      currentPosition : 0,
+      typingStarted : false,
+      typingStartTime : 0,
+      typingEndTime: 0,
+      typingTimer: 0
     } 
   }
 
   compareInput(event){
+    if(this.state.typingStarted === false){
+      this.setState({
+        typingStarted : true,
+        typingStartTime : Date.now()
+      })
+      this.timer = setInterval(() => {
+        this.setState({typingTimer : Date.now() - this.state.typingStartTime})
+      }, 10);
+    }
     let input = event.target.value
     let inputChar = input.substring(event.target.value.length-1,input.length)
     let currentWord = this.state.words[this.state.currentPosition]
-
     if(inputChar === " "){
       if(input.substring(0,input.length-1) === this.state.words[this.state.currentPosition]){
-        this.setState({currentPosition: this.state.currentPosition +1})
         event.target.value = ""
         event.target.style.background = "white"
+        // Final word
+        if(this.state.currentPosition +1 >= this.state.words.length){
+          console.log('nice')
+          clearInterval(this.timer);
+        }
+        this.setState({currentPosition: this.state.currentPosition +1})
         return
       }
     }
@@ -45,6 +62,7 @@ class App extends Component {
     return (
       <div className="App">
         <div>
+          <h1>{this.state.typingTimer}</h1>
           <ul>
             {wordList}
           </ul>
