@@ -58,14 +58,26 @@ class App extends Component {
       event.target.style.background = "white"
     }
   }
+  resetApp(){
+    this.setState({
+      words: ["The","big","dog","named","Dave","ate","sausages!"],
+      currentPosition : 0,
+      typingStarted : false,
+      typingFinished: false,
+      typingStartTime : 0,
+      typingEndTime: 0,
+      typingTimer: 0,
+    })
+  }
   displayMinutesAndSeconds(timer){
     let minutes = Math.floor(timer / 60000);
     let seconds = ((timer % 60000) / 1000).toFixed(0);
-    return (seconds == 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+    return (seconds === 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
   }
 
   render(){
-    const wordList = [];
+    let wordList = [];
+    let userInput;
     for(var i = 0; i < this.state.words.length; i++){
       let itemClass = "word "
       if(i < this.state.currentPosition ){
@@ -75,6 +87,12 @@ class App extends Component {
         itemClass += "currentWord"
       }
       wordList.push(<li className={itemClass} key={i}>{this.state.words[i]}</li>)
+    }
+    if(this.state.typingFinished){
+      userInput = <button onClick={this.resetApp.bind(this)}>Retry</button>
+    }
+    else{
+      userInput = <input onInput={this.compareInput.bind(this)}></input>
     }
     return (
       <div className="App">
@@ -86,7 +104,7 @@ class App extends Component {
           </ul>
         </div>
         <div>
-          <input onInput={this.compareInput.bind(this)}></input>
+          {userInput}
         </div>
       </div>
     )
