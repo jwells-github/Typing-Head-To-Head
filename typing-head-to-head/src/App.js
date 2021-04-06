@@ -1,6 +1,9 @@
 import React, {Component} from 'react'
 import './App.css';
 
+const avgCharactersInWord = 5;
+const milisecondsInMinute = 60000;
+
 class App extends Component {
   constructor(props){
     super(props);
@@ -37,14 +40,13 @@ class App extends Component {
         if(this.state.currentPosition +1 >= this.state.words.length){
           let typingEndTime = Date.now()
           clearInterval(this.timer);
-          let standardisedWordCount = this.state.words.join(' ').length / 5
-          let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
+          let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
+          let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / milisecondsInMinute)
           this.setState({
             typingFinished: true,
             wpm : Math.round(wpm),
             typingEndTime : typingEndTime
           })
-          console.log('WPM ' + wpm)
         }
         this.setState({currentPosition: this.state.currentPosition +1})
         return
