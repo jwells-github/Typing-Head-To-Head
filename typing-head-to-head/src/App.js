@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import './App.css';
 
 const avgCharactersInWord = 5;
-const milisecondsInMinute = 60000;
 
 class App extends Component {
   constructor(props){
@@ -41,7 +40,7 @@ class App extends Component {
           let typingEndTime = Date.now()
           clearInterval(this.timer);
           let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
-          let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / milisecondsInMinute)
+          let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
           this.setState({
             typingFinished: true,
             wpm : Math.round(wpm),
@@ -59,6 +58,12 @@ class App extends Component {
       event.target.style.background = "white"
     }
   }
+  displayMinutesAndSeconds(timer){
+    let minutes = Math.floor(timer / 60000);
+    let seconds = ((timer % 60000) / 1000).toFixed(0);
+    return (seconds == 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+  }
+
   render(){
     const wordList = [];
     for(var i = 0; i < this.state.words.length; i++){
@@ -74,12 +79,11 @@ class App extends Component {
     return (
       <div className="App">
         <div>
-          <h1>{this.state.typingTimer}</h1>
+          <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>
           <h2>{this.state.wpm} WPM</h2>
           <ul>
             {wordList}
           </ul>
-          <h1>{this.state.words[this.state.currentPosition]}</h1>
         </div>
         <div>
           <input onInput={this.compareInput.bind(this)}></input>
