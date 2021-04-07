@@ -75,7 +75,19 @@ class App extends Component {
     return (seconds === 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
   }
 
+  fetchStuff(){
+    return new Promise((resolve,reject) =>{
+      fetch('/test/')
+      .then(res => {
+        resolve(res.json())
+      })
+    })
+  }
   render(){
+    this.fetchStuff().then(response =>{
+      console.log(response.words)
+    })
+    
     let wordList = [];
     let userInput;
     for(var i = 0; i < this.state.words.length; i++){
