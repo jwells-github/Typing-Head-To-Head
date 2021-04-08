@@ -7,7 +7,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      words: ["The","big","dog","named","Dave","ate","sausages!"],
+      words: [],
       currentPosition : 0,
       typingStarted : false,
       typingFinished: false,
@@ -16,6 +16,11 @@ class App extends Component {
       typingTimer: 0,
       wpm: 0
     } 
+  }
+  componentDidMount(){
+    this.getPassage().then(response =>{
+      this.setState({words:response.text.split(' ')})
+    })
   }
 
   compareInput(event){
@@ -32,23 +37,26 @@ class App extends Component {
     let inputChar = input.substring(event.target.value.length-1,input.length)
     let currentWord = this.state.words[this.state.currentPosition]
     if(inputChar === " "){
-      if(input.substring(0,input.length-1) === this.state.words[this.state.currentPosition]){
+      if(input.substring(0,input.length-1) === currentWord){
         event.target.value = ""
         event.target.style.background = "white"
-        // Final word
-        if(this.state.currentPosition +1 >= this.state.words.length){
-          let typingEndTime = Date.now()
-          clearInterval(this.timer);
-          let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
-          let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
-          this.setState({
-            typingFinished: true,
-            wpm : Math.round(wpm),
-            typingEndTime : typingEndTime
-          })
-        }
         this.setState({currentPosition: this.state.currentPosition +1})
         return
+      }
+    }
+    // Final word
+    if(this.state.currentPosition +1 >= this.state.words.length){
+      if(input === currentWord){
+        let typingEndTime = Date.now()
+        clearInterval(this.timer);
+        let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
+        let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
+        this.setState({
+          currentPosition: this.state.currentPosition +1,
+          typingFinished: true,
+          wpm : Math.round(wpm),
+          typingEndTime : typingEndTime
+        })
       }
     }
     if (currentWord.substring(0,input.length) !== input){
@@ -59,15 +67,19 @@ class App extends Component {
     }
   }
   resetApp(){
-    this.setState({
-      words: ["The","big","dog","named","Dave","ate","sausages!"],
-      currentPosition : 0,
-      typingStarted : false,
-      typingFinished: false,
-      typingStartTime : 0,
-      typingEndTime: 0,
-      typingTimer: 0,
+    this.getPassage().then(response =>{
+      console.log(response.text)
+      this.setState({
+        words: response.text.split(' '),
+        currentPosition : 0,
+        typingStarted : false,
+        typingFinished: false,
+        typingStartTime : 0,
+        typingEndTime: 0,
+        typingTimer: 0,
+      })
     })
+
   }
   displayMinutesAndSeconds(timer){
     let minutes = Math.floor(timer / 60000);
@@ -75,7 +87,7 @@ class App extends Component {
     return (seconds === 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
   }
 
-  fetchStuff(){
+  getPassage(){
     return new Promise((resolve,reject) =>{
       fetch('/test/')
       .then(res => {
@@ -83,11 +95,8 @@ class App extends Component {
       })
     })
   }
+
   render(){
-    this.fetchStuff().then(response =>{
-      console.log(response.words)
-    })
-    
     let wordList = [];
     let userInput;
     for(var i = 0; i < this.state.words.length; i++){
