@@ -1,18 +1,19 @@
 import React, {Component} from 'react'
-import socketIOClient from "socket.io-client";
 import './App.css';
+import TypingProgress from './TypingProgress';
 
 const avgCharactersInWord = 5;
-const socket = socketIOClient()
 
 class Game extends Component {
   constructor(props){
     super(props);
     this.state = {
-      words: [],
+      words: this.props.words,
       currentPosition : 0,
+      opponentPosition: 0,
       typingStarted : false,
       typingFinished: false,
+      raceWinner: false,
       typingStartTime : 0,
       typingEndTime: 0,
       typingTimer: 0,
@@ -21,11 +22,11 @@ class Game extends Component {
   }
 
   componentDidMount(){
-    this.getPassage().then(response =>{
-      this.setState({words:response.text.split(' ')})
-    })
-    socket.on('word-send', function(word){
-      this.setState({wpm:word.length})
+    this.props.socket.on('word-send', function(position){
+      this.setState({opponentPosition : position})
+    }.bind(this))
+    this.props.socket.on('endRace', function(winnerID){
+      this.setState({typingFinished: true, raceWinner : this.props.socket.id === winnerID })
     }.bind(this))
   }
 
@@ -46,7 +47,7 @@ class Game extends Component {
       if(input.substring(0,input.length-1) === currentWord){
         event.target.value = ""
         event.target.style.background = "white"
-        socket.emit('word', currentWord)
+        this.props.socket.emit('word', this.state.currentPosition + 1)
         this.setState({currentPosition: this.state.currentPosition +1})
         return
       }
@@ -55,6 +56,7 @@ class Game extends Component {
     if(this.state.currentPosition +1 >= this.state.words.length){
       if(input === currentWord){
         let typingEndTime = Date.now()
+        this.props.socket.emit('complete', this.state.typingTimer)
         clearInterval(this.timer);
         let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
         let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
@@ -62,7 +64,8 @@ class Game extends Component {
           currentPosition: this.state.currentPosition +1,
           typingFinished: true,
           wpm : Math.round(wpm),
-          typingEndTime : typingEndTime
+          typingEndTime : typingEndTime,
+          raceWinner: true
         })
       }
     }
@@ -104,36 +107,31 @@ class Game extends Component {
   }
 
   render(){
-    let wordList = [];
     let userInput;
-    for(var i = 0; i < this.state.words.length; i++){
-      let itemClass = "word "
-      if(i < this.state.currentPosition ){
-        itemClass += "completedWord"
-      }
-      else if(i === this.state.currentPosition ){
-        itemClass += "currentWord"
-      }
-      wordList.push(<li className={itemClass} key={i}>{this.state.words[i]}</li>)
-    }
     if(this.state.typingFinished){
-      userInput = <button onClick={this.resetApp.bind(this)}>Retry</button>
+      userInput = 
+      <div>
+        <h1>{this.state.raceWinner ? "win" : "lose"}</h1>
+        <button onClick={this.resetApp.bind(this)}>Retry</button>
+      </div>
     }
     else{
-      userInput = <input onInput={this.compareInput.bind(this)}></input>
+      userInput = 
+      <div>
+        <input onInput={this.compareInput.bind(this)}></input>
+      </div>
     }
     return (
       <div className="App">
         <div>
           <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>
           <h2>{this.state.wpm} WPM</h2>
-          <ul>
-            {wordList}
-          </ul>
+          <TypingProgress words={this.state.words} progress={this.state.currentPosition}/>
         </div>
         <div>
           {userInput}
         </div>
+        <div><TypingProgress words={this.state.words} progress={this.state.opponentPosition}/></div>
       </div>
     )
   }
