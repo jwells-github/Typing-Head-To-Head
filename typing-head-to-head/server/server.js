@@ -9,7 +9,7 @@ const fs = require('fs');
 
 var waiting = new Set(); 
 
-io.on('connection', (socket) => {
+io.on('connection', (socket) => { 
   socket.on('word', (currentPosition) =>{
     socket.to(socket.room).emit('word-send',currentPosition)
   })
@@ -19,9 +19,11 @@ io.on('connection', (socket) => {
   socket.on('findGame', (removeMe) =>{
     if(waiting.has(socket)){
       waiting.delete(socket)
+      socket.emit('inWaiting', false)
       return; 
     }
-    waiting.add(socket)
+    waiting.add(socket) 
+    socket.emit('inWaiting', true)
     if(waiting.size > 1){
       let iterator = waiting.values()
       let playerOne = iterator.next().value;
@@ -37,14 +39,20 @@ io.on('connection', (socket) => {
         .then(data => 
         {
           io.to(room).emit('gameReady', data.passages[Math.floor(Math.random() * data.passages.length)])
+          let countDownLength = 5;
+          let countDown = setInterval(() => {
+            if(countDownLength < 1){
+              clearInterval(countDown)
+            }
+            io.to(room).emit('countdown', countDownLength)
+            countDownLength--;
+          }, 1000);
         })
         .catch(err => {
           return
         })
     }
   })
-
-  console.log('a user connected');
   socket.on("disconnect", () => {
     waiting.delete(socket)
   });

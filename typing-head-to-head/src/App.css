@@ -11,6 +11,17 @@
   border-bottom: 1px dotted black;
 }
 
+.Players{
+  display:flex;
+}
+.PlayerOne, .PlayerTwo{
+  width:50%;
+}
+.TypingInput{
+  width:50%;
+  height: 20px;
+}
+
 .App {
   text-align: center;
 }

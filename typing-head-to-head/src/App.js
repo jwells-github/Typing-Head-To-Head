@@ -8,6 +8,7 @@ class App extends Component {
     super(props);
     this.state = {
       socket : socketIOClient(),
+      searchingForGame: false,
       gameMatched:false,
       words: []
     }
@@ -16,8 +17,12 @@ class App extends Component {
     this.state.socket.on('gameReady', function(words){
       this.setState({
         gameMatched:true,
-        words:words.text.split(' ')
+        words:words.text.split(' '),
+        searchingForGame: false
       })
+    }.bind(this))
+    this.state.socket.on('inWaiting', function(isWaiting){
+      this.setState({searchingForGame : isWaiting})
     }.bind(this))
   }
 
@@ -37,7 +42,7 @@ class App extends Component {
     else{
       return (
         <div className="App">
-          <button onClick={this.findGame.bind(this)}>Find a game</button>
+          <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
         </div>
       )
     }
