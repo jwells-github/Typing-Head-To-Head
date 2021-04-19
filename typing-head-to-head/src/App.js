@@ -22,7 +22,7 @@ class App extends Component {
   }
 
   findGame(){
-    console.log(this.state.socket.id)
+    this.setState({gameMatched: false})
     this.state.socket.emit('findGame', 'hmmm')
   }
 
@@ -30,7 +30,7 @@ class App extends Component {
     if(this.state.gameMatched){
       return (
         <div className="App">
-          <Game words={this.state.words} socket={this.state.socket}/>
+          <Game findGame={()=>this.findGame()} words={this.state.words} socket={this.state.socket}/>
         </div>
       )
     }

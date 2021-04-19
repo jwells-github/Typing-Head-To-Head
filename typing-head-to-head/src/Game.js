@@ -112,7 +112,7 @@ class Game extends Component {
       userInput = 
       <div>
         <h1>{this.state.raceWinner ? "win" : "lose"}</h1>
-        <button onClick={this.resetApp.bind(this)}>Retry</button>
+        <button onClick={this.props.findGame}>Search for another game</button>
       </div>
     }
     else{
