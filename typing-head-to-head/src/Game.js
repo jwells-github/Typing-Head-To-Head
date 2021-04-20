@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import './App.css';
-import TypingProgress from './TypingProgress';
+import Player from './Player';
 
 const avgCharactersInWord = 5;
 
@@ -152,23 +152,20 @@ class Game extends Component {
       <div className="Game">
         {topDisplay}
         <div className="Players">
-          <div className="PlayerOne">
-            <h2>You</h2>
-            <div>
-              <h2>{this.state.playerWPM} WPM</h2>
-              <TypingProgress words={this.state.words} progress={this.state.playerPosition}/>
-            </div>
-            <div>
-              {userInput}
-            </div>
-          </div>
-          <div className="PlayerTwo">
-            <h2>Your opponent</h2>
-            <div>
-              <h2>{this.state.opponentWPM} WPM</h2>
-              <TypingProgress words={this.state.words} progress={this.state.opponentPosition}/>
-            </div>
-          </div>
+          <Player 
+            opponent={false} 
+            wpm={this.state.playerWPM} 
+            progress={this.state.playerPosition}
+            words={this.state.words}/>
+          <Player 
+            soloGame ={this.props.soloGame}
+            opponent={true} 
+            wpm={this.state.opponentWPM} 
+            progress={this.state.opponentPosition}
+            words={this.state.words}/>
+        </div>
+        <div>
+          {userInput}
         </div>
       </div>
     )

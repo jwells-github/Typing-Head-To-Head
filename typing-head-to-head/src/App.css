@@ -15,7 +15,7 @@
   display:flex;
 }
 .PlayerOne, .PlayerTwo{
-  width:50%;
+  flex-grow: 1;
 }
 .TypingInput{
   width:50%;

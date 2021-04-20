@@ -9,6 +9,7 @@ class App extends Component {
     this.state = {
       socket : socketIOClient(),
       searchingForGame: false,
+      soloGame: false,
       gameMatched:false,
       words: []
     }
@@ -28,18 +29,34 @@ class App extends Component {
 
   findGame(){
     this.setState({gameMatched: false})
-    this.state.socket.emit('findGame', 'hmmm')
+    this.state.socket.emit('findGame')
+  }
+
+  soloGame(){
+    this.setState({soloGame: true})
+    this.state.socket.emit("soloGame")
+  }
+
+  leaveGame(){
+    this.setState({
+      searchingForGame: false,
+      soloGame: false,
+      gameMatched:false,
+      words: []
+    })
   }
 
   render(){
     if(this.state.gameMatched){
+      console.log(this.state.soloGame)
       return (
         <div className="App">
           <Game 
+            soloGame ={this.state.soloGame}
             findGame={()=>this.findGame()}
             words={this.state.words} 
             socket={this.state.socket}
-            leaveGame={()=>this.setState({gameMatched : false})}  
+            leaveGame={()=>this.leaveGame()}  
             />
         </div>
       )
@@ -48,6 +65,7 @@ class App extends Component {
       return (
         <div className="App">
           <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
+          <button onClick={this.soloGame.bind(this)}>Play Solo</button>
         </div>
       )
     }
