@@ -10,7 +10,7 @@ class Game extends Component {
     super(props);
     this.state = {
       words: this.props.words,
-      currentPosition : 0,
+      playerPosition : 0,
       opponentPosition: 0,
       gameCountDown: 5,
       gameStarted : false,
@@ -19,7 +19,8 @@ class Game extends Component {
       typingStartTime : 0,
       typingEndTime: 0,
       typingTimer: 0,
-      wpm: 0
+      playerWPM: 0,
+      opponentWPM: 0,
     } 
   }
 
@@ -28,7 +29,14 @@ class Game extends Component {
       this.setState({opponentPosition : position})
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
-      this.setState({typingFinished: true, raceWinner : this.props.socket.id === winnerID })
+      let isWinner = this.props.socket.id === winnerID
+      this.setState({
+        typingFinished: true, 
+        raceWinner : isWinner,
+        opponentPosition: isWinner ? this.state.opponentPosition : this.state.words.length,
+        playerWPM: this.calculateWPM(this.state.playerPosition),
+        opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this.state.words.length)
+      })
     }.bind(this))
     this.props.socket.on('countdown', function(time){
       let gameStarted = time < 1
@@ -44,11 +52,23 @@ class Game extends Component {
               clearInterval(timer)
               return;
             }
-            this.setState({typingTimer : Date.now() - this.state.typingStartTime})
+
+            this.setState({
+              typingTimer : Date.now() - this.state.typingStartTime,
+              playerWPM: this.calculateWPM(this.state.playerPosition),
+              opponentWPM : this.calculateWPM(this.state.opponentPosition)})
+
           }, 1000);
           document.getElementById("TypingInput").focus();
         }
     }.bind(this))
+  }
+
+  calculateWPM(position){
+    let typingTime = Date.now()
+    let standardisedWordCount = this.state.words.slice(0,position).join(' ').length / avgCharactersInWord
+    let wpm = Math.round(standardisedWordCount / ((typingTime - this.state.typingStartTime ) / 60000))
+    return wpm
   }
 
   compareInput(event){
@@ -60,28 +80,27 @@ class Game extends Component {
     }
     let input = event.target.value
     let inputChar = input.substring(event.target.value.length-1,input.length)
-    let currentWord = this.state.words[this.state.currentPosition]
+    let currentWord = this.state.words[this.state.playerPosition]
     if(inputChar === " "){
       if(input.substring(0,input.length-1) === currentWord){
         event.target.value = ""
         event.target.style.background = "white"
-        this.props.socket.emit('word', this.state.currentPosition + 1)
-        this.setState({currentPosition: this.state.currentPosition +1})
+        this.props.socket.emit('word', this.state.playerPosition + 1)
+        this.setState({
+          playerPosition: this.state.playerPosition +1,
+        })
         return
       }
     }
     // Final word
-    if(this.state.currentPosition +1 >= this.state.words.length){
+    if(this.state.playerPosition +1 >= this.state.words.length){
       if(input === currentWord){
         let typingEndTime = Date.now()
         this.props.socket.emit('complete', this.state.typingTimer)
         clearInterval(timer);
-        let standardisedWordCount = this.state.words.join(' ').length / avgCharactersInWord
-        let wpm = standardisedWordCount / ((typingEndTime - this.state.typingStartTime ) / 60000)
         this.setState({
-          currentPosition: this.state.currentPosition +1,
+          playerPosition: this.state.playerPosition +1,
           typingFinished: true,
-          wpm : Math.round(wpm),
           typingEndTime : typingEndTime,
           raceWinner: true
         })
@@ -124,7 +143,7 @@ class Game extends Component {
         <div>
           <input id="TypingInput" disabled="disabled"></input>
         </div>
-      topDisplay = <h1>{this.state.gameCountDown}</h1>
+      topDisplay = <h1>Game starting in {this.state.gameCountDown}  </h1>
     }
     else{
       userInput = 
@@ -140,8 +159,8 @@ class Game extends Component {
           <div className="PlayerOne">
             <h2>You</h2>
             <div>
-              <h2>{this.state.wpm} WPM</h2>
-              <TypingProgress words={this.state.words} progress={this.state.currentPosition}/>
+              <h2>{this.state.playerWPM} WPM</h2>
+              <TypingProgress words={this.state.words} progress={this.state.playerPosition}/>
             </div>
             <div>
               {userInput}
@@ -150,7 +169,7 @@ class Game extends Component {
           <div className="PlayerTwo">
             <h2>Your opponent</h2>
             <div>
-              <h2>0 WPM</h2>
+              <h2>{this.state.opponentWPM} WPM</h2>
               <TypingProgress words={this.state.words} progress={this.state.opponentPosition}/>
             </div>
           </div>
