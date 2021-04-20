@@ -67,7 +67,7 @@ app.get('/test', function (req,res) {
         return res.status(200).json(data.passages[Math.floor(Math.random() * data.passages.length)])
       })
     .catch(err => {return res.status(200).json({"error" : err})})
-})
+})  
 
 function getPassages(){
   return new Promise(function(resolve,reject){
