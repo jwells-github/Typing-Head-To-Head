@@ -3,7 +3,6 @@ import './App.css';
 import TypingProgress from './TypingProgress';
 
 const avgCharactersInWord = 5;
-let timer;
 
 class Game extends Component {
   constructor(props){
@@ -52,12 +51,10 @@ class Game extends Component {
               clearInterval(timer)
               return;
             }
-
             this.setState({
               typingTimer : Date.now() - this.state.typingStartTime,
               playerWPM: this.calculateWPM(this.state.playerPosition),
               opponentWPM : this.calculateWPM(this.state.opponentPosition)})
-
           }, 1000);
           document.getElementById("TypingInput").focus();
         }
@@ -95,13 +92,11 @@ class Game extends Component {
     // Final word
     if(this.state.playerPosition +1 >= this.state.words.length){
       if(input === currentWord){
-        let typingEndTime = Date.now()
-        this.props.socket.emit('complete', this.state.typingTimer)
-        clearInterval(timer);
+        this.props.socket.emit('complete', this.state.typingTimer);
         this.setState({
           playerPosition: this.state.playerPosition +1,
           typingFinished: true,
-          typingEndTime : typingEndTime,
+          typingEndTime : Date.now(),
           raceWinner: true
         })
       }
@@ -136,6 +131,7 @@ class Game extends Component {
       <div>
         <h1>{this.state.raceWinner ? "win" : "lose"}</h1>
         <button onClick={this.props.findGame}>Search for another game</button>
+        <button onClick={this.props.leaveGame}>Leave game</button>
       </div>
     }
     else if(!this.state.gameStarted){

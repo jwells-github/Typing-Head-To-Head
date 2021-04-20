@@ -35,7 +35,12 @@ class App extends Component {
     if(this.state.gameMatched){
       return (
         <div className="App">
-          <Game findGame={()=>this.findGame()} words={this.state.words} socket={this.state.socket}/>
+          <Game 
+            findGame={()=>this.findGame()}
+            words={this.state.words} 
+            socket={this.state.socket}
+            leaveGame={()=>this.setState({gameMatched : false})}  
+            />
         </div>
       )
     }
