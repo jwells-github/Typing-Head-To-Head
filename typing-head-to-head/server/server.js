@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
   socket.on('complete', (timer) =>{
     io.emit('endRace', socket.id);
   })
-  socket.on('findGame', (removeMe) =>{
+  socket.on('findGame', function() {
     if(waiting.has(socket)){
       waiting.delete(socket)
       socket.emit('inWaiting', false)
