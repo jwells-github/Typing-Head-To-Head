@@ -35,10 +35,10 @@ io.on('connection', (socket) => {
       playerTwo.room = room;
       playerOne.join(room);
       playerTwo.join(room);
-      getPassages()
+      getPassage()
         .then(data => 
         {
-          io.to(room).emit('gameReady', data.passages[Math.floor(Math.random() * data.passages.length)])
+          io.to(room).emit('gameReady', data)
           let countDownLength = 5;
           let countDown = setInterval(() => {
             if(countDownLength < 1){
@@ -60,23 +60,15 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
-app.get('/test', function (req,res) {
-  getPassages()
-    .then(data => 
-      {
-        return res.status(200).json(data.passages[Math.floor(Math.random() * data.passages.length)])
-      })
-    .catch(err => {return res.status(200).json({"error" : err})})
-})  
-
-function getPassages(){
+function getPassage(){
   return new Promise(function(resolve,reject){
     fs.readFile('passages.json', (err,data) =>{
       if(err){
         reject(err);
         return
       } 
-      resolve(JSON.parse(data));
+      let passagesData = JSON.parse(data)
+      resolve(passagesData.passages[Math.floor(Math.random() * passagesData.passages.length)]);
     })
   })
 }
