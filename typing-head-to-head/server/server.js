@@ -16,7 +16,21 @@ io.on('connection', (socket) => {
   socket.on('complete', (timer) =>{
     io.emit('endRace', socket.id);
   })
+  socket.on('soloGame', function(){
+    getPassage().then(data =>{
+      socket.emit('gameReady', data)
+      let countDownLength = 5;
+      let countDown = setInterval(() => {
+        if(countDownLength < 1){
+          clearInterval(countDown)
+        }
+        socket.emit('countdown', countDownLength)
+        countDownLength--;
+      }, 1000);
+    })
+  })
   socket.on('findGame', function() {
+    console.log('????')
     if(waiting.has(socket)){
       waiting.delete(socket)
       socket.emit('inWaiting', false)
@@ -35,22 +49,20 @@ io.on('connection', (socket) => {
       playerTwo.room = room;
       playerOne.join(room);
       playerTwo.join(room);
-      getPassage()
-        .then(data => 
-        {
-          io.to(room).emit('gameReady', data)
-          let countDownLength = 5;
-          let countDown = setInterval(() => {
-            if(countDownLength < 1){
-              clearInterval(countDown)
-            }
-            io.to(room).emit('countdown', countDownLength)
-            countDownLength--;
-          }, 1000);
-        })
-        .catch(err => {
-          return
-        })
+      getPassage().then(data => {
+        io.to(room).emit('gameReady', data)
+        let countDownLength = 5;
+        let countDown = setInterval(() => {
+          if(countDownLength < 1){
+            clearInterval(countDown)
+          }
+          io.to(room).emit('countdown', countDownLength)
+          countDownLength--;
+        }, 1000);
+      })
+      .catch(err => {
+        return
+      })
     }
   })
   socket.on("disconnect", () => {
