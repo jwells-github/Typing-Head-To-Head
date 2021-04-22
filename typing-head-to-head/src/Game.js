@@ -6,6 +6,7 @@ import GameInput from './GameInput';
 const avgCharactersInWord = 5;
 
 class Game extends Component {
+  _isMounted = false;
   constructor(props){
     super(props);
     this.state = {
@@ -25,42 +26,52 @@ class Game extends Component {
   }
 
   componentDidMount(){
+    this._isMounted = true;
     this.props.socket.on('word-send', function(position){
       this.setState({opponentPosition : position})
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
       let isWinner = this.props.socket.id === winnerID
-      this.setState({
-        typingFinished: true, 
-        raceWinner : isWinner,
-        opponentPosition: isWinner ? this.state.opponentPosition : this.state.words.length,
-        playerWPM: this.calculateWPM(this.state.playerPosition),
-        opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this.state.words.length)
-      })
+      if(this._isMounted){
+        this.setState({
+          typingFinished: true, 
+          raceWinner : isWinner,
+          opponentPosition: isWinner ? this.state.opponentPosition : this.state.words.length,
+          playerWPM: this.calculateWPM(this.state.playerPosition),
+          opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this.state.words.length)
+        })
+      }
     }.bind(this))
     this.props.socket.on('countdown', function(time){
       let gameStarted = time < 1
-      this.setState(
-        {
-          gameCountDown : time,
-          gameStarted: gameStarted,
-          typingStartTime : Date.now()
-        });
-        if(gameStarted){
-          let timer = setInterval(() => {
-            if(this.state.typingFinished){
-              clearInterval(timer)
-              return;
-            }
-            this.setState({
-              typingTimer : Date.now() - this.state.typingStartTime,
-              playerWPM: this.calculateWPM(this.state.playerPosition),
-              opponentWPM : this.calculateWPM(this.state.opponentPosition)})
-          }, 1000);
-          document.getElementById("TypingInput").focus();
-        }
+      if(this._isMounted){
+        this.setState(
+          {
+            gameCountDown : time,
+            gameStarted: gameStarted,
+            typingStartTime : Date.now()
+          });
+      }
+      if(gameStarted){
+        this.timer = setInterval(() => {
+          if(this.state.typingFinished){
+            clearInterval(this.timer)
+            return;
+          }
+          this.setState({
+            typingTimer : Date.now() - this.state.typingStartTime,
+            playerWPM: this.calculateWPM(this.state.playerPosition),
+            opponentWPM : this.calculateWPM(this.state.opponentPosition)})
+        }, 1000);
+        document.getElementById("TypingInput").focus();
+      }
     }.bind(this))
   }
+  componentWillUnmount(){
+    clearInterval(this.timer)
+    this._isMounted = false;
+  }
+
 
   calculateWPM(position){
     let typingTime = Date.now()
