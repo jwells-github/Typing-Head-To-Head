@@ -70,12 +70,6 @@ class Game extends Component {
   }
 
   compareInput(event){
-    if(this.state.typingStarted === false){
-      this.setState({
-        typingStarted : true,
-        typingStartTime : Date.now()
-      })
-    }
     let input = event.target.value
     let inputChar = input.substring(event.target.value.length-1,input.length)
     let currentWord = this.state.words[this.state.playerPosition]
