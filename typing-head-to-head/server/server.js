@@ -11,7 +11,7 @@ var waiting = new Set();
 
 io.on('connection', (socket) => { 
   socket.on('word', (currentPosition) =>{
-    socket.to(socket.room).emit('word-send',currentPosition)
+    socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
   socket.on('complete', (timer) =>{
     io.emit('endRace', socket.id);
@@ -30,7 +30,6 @@ io.on('connection', (socket) => {
     })
   })
   socket.on('findGame', function() {
-    console.log('????')
     if(waiting.has(socket)){
       waiting.delete(socket)
       socket.emit('inWaiting', false)
