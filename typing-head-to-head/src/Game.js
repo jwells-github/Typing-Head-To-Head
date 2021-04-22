@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import './App.css';
 import Player from './Player';
+import GameInput from './GameInput';
 
 const avgCharactersInWord = 5;
 
@@ -124,29 +125,9 @@ class Game extends Component {
   }
 
   render(){
-    let userInput;
     let topDisplay = <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>;
-    if(this.state.typingFinished){
-      userInput = 
-      <div>
-        <h1>{this.state.raceWinner ? "win" : "lose"}</h1>
-        <button onClick={this.props.findGame}>Search for another game</button>
-        <button onClick={this.props.leaveGame}>Leave game</button>
-      </div>
-    }
-    else if(!this.state.gameStarted){
-      userInput = 
-        <div>
-          <input id="TypingInput" disabled="disabled"></input>
-        </div>
+    if(!this.state.gameStarted){
       topDisplay = <h1>Game starting in {this.state.gameCountDown}  </h1>
-    }
-    else{
-      userInput = 
-        <div>
-          <input id="TypingInput" onInput={this.compareInput.bind(this)}></input>
-        </div>
-      
     }
     return (
       <div className="Game">
@@ -165,7 +146,14 @@ class Game extends Component {
             words={this.state.words}/>
         </div>
         <div>
-          {userInput}
+          <GameInput
+            typingFinished={this.state.typingFinished}
+            raceWinner={this.state.raceWinner}
+            findGame={this.state.findGame}
+            leaveGame={this.state.leaveGame}
+            gameStarted={this.state.gameStarted}
+            compareInput ={this.compareInput.bind(this)}
+          />
         </div>
       </div>
     )
