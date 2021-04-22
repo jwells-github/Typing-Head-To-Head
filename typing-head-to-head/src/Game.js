@@ -143,8 +143,8 @@ class Game extends Component {
           <GameInput
             typingFinished={this.state.typingFinished}
             raceWinner={this.state.raceWinner}
-            findGame={this.state.findGame}
-            leaveGame={this.state.leaveGame}
+            playAgain={this.props.playAgain}
+            leaveGame={this.props.leaveGame}
             gameStarted={this.state.gameStarted}
             compareInput ={this.compareInput.bind(this)}
           />

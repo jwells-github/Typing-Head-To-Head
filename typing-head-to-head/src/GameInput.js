@@ -6,7 +6,7 @@ class GameInput extends Component {
       return(
         <div>
           <h1>{this.props.raceWinner ? "win" : "lose"}</h1>
-          <button onClick={this.props.findGame}>Search for another game</button>
+          <button onClick={this.props.playAgain}>Play again</button>
           <button onClick={this.props.leaveGame}>Leave game</button>
         </div>
       )
@@ -21,7 +21,7 @@ class GameInput extends Component {
     else{
       return(
         <div>
-          <input id="TypingInput" onInput={this.props.compareInput}/>
+          <input id="TypingInput" onInput={this.props.compareInput} autoComplete="off"/>
         </div>
       )
     }

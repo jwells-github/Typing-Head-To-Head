@@ -33,7 +33,8 @@ class App extends Component {
   }
 
   soloGame(){
-    this.setState({soloGame: true})
+    console.log('sologame')
+    this.setState({soloGame: true, gameMatched: false})
     this.state.socket.emit("soloGame")
   }
 
@@ -53,7 +54,7 @@ class App extends Component {
         <div className="App">
           <Game 
             soloGame ={this.state.soloGame}
-            findGame={()=>this.findGame()}
+            playAgain={()=>{this.state.soloGame ? this.soloGame() : this.findGame() }}
             words={this.state.words} 
             socket={this.state.socket}
             leaveGame={()=>this.leaveGame()}  

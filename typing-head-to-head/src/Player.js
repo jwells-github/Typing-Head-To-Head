@@ -4,7 +4,6 @@ import TypingProgress from './TypingProgress';
 class Player extends Component {  
   render(){
     if(this.props.soloGame){
-      console.log('sologame')
       return(<div></div>)
     }
     return(
