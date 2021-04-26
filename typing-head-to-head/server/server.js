@@ -16,6 +16,9 @@ io.on('connection', (socket) => {
   socket.on('complete', function(){
     io.emit('endRace', socket.id);
   })
+  socket.on('leavePrivateRoom', (room) =>{
+    socket.leave(room);
+  })
   socket.on('privateGame',(room) =>{
     socket.join(room);
     matchUsers(room)

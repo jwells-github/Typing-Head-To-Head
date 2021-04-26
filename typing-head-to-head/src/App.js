@@ -44,15 +44,24 @@ class App extends Component {
     event.preventDefault();
     let room = document.getElementById("privateRoom");
     console.log(room.value)
-    this.setState({gameMatched: false})
+    this.setState({
+      gameMatched: false,
+      privateGame: true,
+      privateRoom: room.value
+    })
     this.state.socket.emit("privateGame", room.value)
     room.value = "";
   }
 
   leaveGame(){
+    if(this.state.privateGame){
+      this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
+    }
     this.setState({
       searchingForGame: false,
       soloGame: false,
+      privateGame: false,
+      privateRoom: '',
       gameMatched:false,
       words: []
     })
@@ -74,6 +83,14 @@ class App extends Component {
       )
     }
     else{
+      if(this.state.privateGame){
+        return(
+          <div>
+            <h1>You are waiting for a game in private room: {this.state.privateRoom}</h1>
+            <button onClick={this.leaveGame.bind(this)}>Leave {this.state.privateRoom}</button>
+          </div>
+        )
+      }
       return (
         <div className="App">
           <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
