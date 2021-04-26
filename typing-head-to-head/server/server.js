@@ -13,8 +13,12 @@ io.on('connection', (socket) => {
   socket.on('word', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
-  socket.on('complete', (timer) =>{
+  socket.on('complete', function(){
     io.emit('endRace', socket.id);
+  })
+  socket.on('privateGame',(room) =>{
+    socket.join(room);
+    matchUsers(room)
   })
   socket.on('soloGame', function(){
     getPassage().then(data =>{
@@ -70,6 +74,37 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+async function matchUsers(roomtest){
+  let sockets = await io.in(roomtest).fetchSockets();
+  console.log(sockets.length)
+  if(sockets.length < 2){
+    return
+  }
+  let playerOne = sockets[0];
+  let playerTwo = sockets[1]
+  let room = playerOne.id + "_" + playerTwo.id;
+  playerOne.room = room;
+  playerTwo.room = room;
+  playerOne.join(room);
+  playerTwo.join(room);
+  getPassage().then(data => {
+    io.to(room).emit('gameReady', data)
+    let countDownLength = 5;
+    let countDown = setInterval(() => {
+      if(countDownLength < 1){
+        clearInterval(countDown)
+      }
+      io.to(room).emit('countdown', countDownLength)
+      countDownLength--;
+    }, 1000);
+  })
+  .catch(err => {
+    return
+  })
+  
+}
+
 
 function getPassage(){
   return new Promise(function(resolve,reject){

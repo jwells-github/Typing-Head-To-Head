@@ -27,7 +27,7 @@ class Game extends Component {
 
   componentDidMount(){
     this._isMounted = true;
-    this.props.socket.on('word-send', function(position){
+    this.props.socket.on('updateOpponentPosition', function(position){
       this.setState({opponentPosition : position})
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
@@ -67,11 +67,11 @@ class Game extends Component {
       }
     }.bind(this))
   }
+
   componentWillUnmount(){
     clearInterval(this.timer)
     this._isMounted = false;
   }
-
 
   calculateWPM(position){
     let typingTime = Date.now()

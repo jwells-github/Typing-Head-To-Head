@@ -10,6 +10,8 @@ class App extends Component {
       socket : socketIOClient(),
       searchingForGame: false,
       soloGame: false,
+      privateGame: false,
+      privateRoom: '',
       gameMatched:false,
       words: []
     }
@@ -36,6 +38,15 @@ class App extends Component {
     console.log('sologame')
     this.setState({soloGame: true, gameMatched: false})
     this.state.socket.emit("soloGame")
+  }
+
+  joinPrivate(event){
+    event.preventDefault();
+    let room = document.getElementById("privateRoom");
+    console.log(room.value)
+    this.setState({gameMatched: false})
+    this.state.socket.emit("privateGame", room.value)
+    room.value = "";
   }
 
   leaveGame(){
@@ -67,6 +78,13 @@ class App extends Component {
         <div className="App">
           <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
           <button onClick={this.soloGame.bind(this)}>Play Solo</button>
+          <div>
+            <form onSubmit={this.joinPrivate.bind(this)}>
+              <label>Join a private Room</label>
+              <input id='privateRoom' placeholder="room name"></input>
+              <button type="submit">Join</button>
+            </form>
+          </div>
         </div>
       )
     }
