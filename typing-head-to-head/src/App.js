@@ -47,16 +47,16 @@ class App extends Component {
       privateGame: true,
       privateRoom: room.value
     })
+    this.findPrivateGame(room.value);
     room.value = "";
-    this.findPrivateGame();
   }
 
-  findPrivateGame(){
+  findPrivateGame(room){
     this.setState({
       gameMatched: false,
       privateGame: true,
     })
-    this.state.socket.emit("privateGame", this.state.privateRoom);
+    this.state.socket.emit("privateGame", room);
   }
 
   leaveGame(){
@@ -81,7 +81,7 @@ class App extends Component {
         playAgain = () => {this.findSoloGame()}
       }
       else if(this.state.privateGame){
-        playAgain = () =>{this.findPrivateGame()}
+        playAgain = () =>{this.findPrivateGame(this.state.room)}
       }
       else{
         playAgain = () => {this.findGame()}
