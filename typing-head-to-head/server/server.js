@@ -10,18 +10,21 @@ const fs = require('fs');
 const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 
 io.on('connection', (socket) => { 
+  socket.on('setUsername', (username) =>{
+    socket.username = username;
+  })
   socket.on('word', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
   socket.on('complete', function(){
     io.emit('endRace', socket.id);
   })
-  socket.on('leavePrivateRoom', (room) =>{
-    socket.leave(room);
+  socket.on('leavePrivateRoom', (privateRoom) =>{
+    socket.leave(privateRoom);
   })
-  socket.on('privateGame',(room) =>{
-    socket.join(room);
-    matchUsers(room)
+  socket.on('privateGame',(privateRoom) =>{
+    socket.join(privateRoom);
+    matchUsers(privateRoom)
   })
   socket.on('soloGame', function(){
     startGame(socket.id)

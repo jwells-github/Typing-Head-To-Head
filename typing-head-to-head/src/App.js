@@ -8,6 +8,7 @@ class App extends Component {
     super(props);
     this.state = {
       socket : socketIOClient(),
+      username: '',
       searchingForGame: false,
       soloGame: false,
       privateGame: false,
@@ -41,14 +42,26 @@ class App extends Component {
 
   joinPrivateRoom(event){
     event.preventDefault();
-    let room = document.getElementById("privateRoom");
+    let roomInput = document.getElementById("privateRoom");
     this.setState({
       gameMatched: false,
       privateGame: true,
-      privateRoom: room.value
+      privateRoom: roomInput.value,
+      searchingForGame: false,
+      soloGame: false,
     })
-    this.findPrivateGame(room.value);
-    room.value = "";
+    this.findPrivateGame(roomInput.value);
+    roomInput.value = "";
+  }
+
+  
+  setUsername(event){
+    event.preventDefault();
+    let usernameInput = document.getElementById("username");
+    this.setState({
+      username: usernameInput.value
+    })
+    this.state.socket.emit("setUsername", usernameInput.value);
   }
 
   findPrivateGame(room){
@@ -74,8 +87,18 @@ class App extends Component {
   }
 
   render(){
+    if(this.state.username === ''){
+      return(
+        <div>
+          <form onSubmit={this.setUsername.bind(this)}>
+            <label>Enter a username</label>
+            <input id='username' placeholder="Username"></input>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      )
+    }
     if(this.state.gameMatched){
-      console.log(this.state.soloGame)
       let playAgain;
       if(this.state.soloGame){
         playAgain = () => {this.findSoloGame()}
