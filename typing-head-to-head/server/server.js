@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 const fs = require('fs');
 
-var waiting = new Set(); 
+const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 
 io.on('connection', (socket) => { 
   socket.on('word', (currentPosition) =>{
@@ -24,88 +24,50 @@ io.on('connection', (socket) => {
     matchUsers(room)
   })
   socket.on('soloGame', function(){
-    getPassage().then(data =>{
-      socket.emit('gameReady', data)
-      let countDownLength = 5;
-      let countDown = setInterval(() => {
-        if(countDownLength < 1){
-          clearInterval(countDown)
-        }
-        socket.emit('countdown', countDownLength)
-        countDownLength--;
-      }, 1000);
-    })
+    startGame(socket.id)
   })
   socket.on('findGame', function() {
-    if(waiting.has(socket)){
-      waiting.delete(socket)
+    if(socket.rooms.has(PUBLIC_WAITING_ROOM)){
+      socket.leave(PUBLIC_WAITING_ROOM)
       socket.emit('inWaiting', false)
-      return; 
+      return;
     }
-    waiting.add(socket) 
     socket.emit('inWaiting', true)
-    if(waiting.size > 1){
-      let iterator = waiting.values()
-      let playerOne = iterator.next().value;
-      let playerTwo = iterator.next().value;
-      waiting.delete(playerOne);
-      waiting.delete(playerTwo);
-      let room = playerOne.id + "_" + playerTwo.id;
-      playerOne.room = room;
-      playerTwo.room = room;
-      playerOne.join(room);
-      playerTwo.join(room);
-      getPassage().then(data => {
-        io.to(room).emit('gameReady', data)
-        let countDownLength = 5;
-        let countDown = setInterval(() => {
-          if(countDownLength < 1){
-            clearInterval(countDown)
-          }
-          io.to(room).emit('countdown', countDownLength)
-          countDownLength--;
-        }, 1000);
-      })
-      .catch(err => {
-        return
-      })
-    }
+    socket.join(PUBLIC_WAITING_ROOM)
+    matchUsers(PUBLIC_WAITING_ROOM)
   })
   socket.on("disconnect", () => {
-    waiting.delete(socket)
   });
 });
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
-async function matchUsers(roomtest){
-  let sockets = await io.in(roomtest).fetchSockets();
-  console.log(sockets.length)
+async function matchUsers(room){
+  let sockets = await io.in(room).fetchSockets();
   if(sockets.length < 2){
     return
   }
   let playerOne = sockets[0];
   let playerTwo = sockets[1]
-  let room = playerOne.id + "_" + playerTwo.id;
-  playerOne.room = room;
-  playerTwo.room = room;
-  playerOne.join(room);
-  playerTwo.join(room);
-  getPassage().then(data => {
-    io.to(room).emit('gameReady', data)
-    let countDownLength = 5;
-    let countDown = setInterval(() => {
-      if(countDownLength < 1){
-        clearInterval(countDown)
-      }
-      io.to(room).emit('countdown', countDownLength)
-      countDownLength--;
-    }, 1000);
-  })
-  .catch(err => {
-    return
-  })
-  
+  let gameRoom = playerOne.id + "_" + playerTwo.id;
+  playerOne.leave(room);
+  playerTwo.leave(room);
+  playerOne.join(gameRoom);
+  playerTwo.join(gameRoom);
+  startGame(gameRoom)
+}
+
+async function startGame(gameRoom){
+  let passage = await getPassage();
+  io.to(gameRoom).emit('gameReady', passage)
+  let countDownLength = 5;
+  let countDown = setInterval(() => {
+    if(countDownLength < 1){
+      clearInterval(countDown)
+    }
+    io.to(gameRoom).emit('countdown', countDownLength)
+    countDownLength--;
+  }, 1000);
 }
 
 
