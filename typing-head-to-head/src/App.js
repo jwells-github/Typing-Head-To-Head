@@ -34,23 +34,29 @@ class App extends Component {
     this.state.socket.emit('findGame')
   }
 
-  soloGame(){
-    console.log('sologame')
+  findSoloGame(){
     this.setState({soloGame: true, gameMatched: false})
     this.state.socket.emit("soloGame")
   }
 
-  joinPrivate(event){
+  joinPrivateRoom(event){
     event.preventDefault();
     let room = document.getElementById("privateRoom");
-    console.log(room.value)
     this.setState({
       gameMatched: false,
       privateGame: true,
       privateRoom: room.value
     })
-    this.state.socket.emit("privateGame", room.value)
     room.value = "";
+    this.findPrivateGame();
+  }
+
+  findPrivateGame(){
+    this.setState({
+      gameMatched: false,
+      privateGame: true,
+    })
+    this.state.socket.emit("privateGame", this.state.privateRoom);
   }
 
   leaveGame(){
@@ -70,11 +76,21 @@ class App extends Component {
   render(){
     if(this.state.gameMatched){
       console.log(this.state.soloGame)
+      let playAgain;
+      if(this.state.soloGame){
+        playAgain = () => {this.findSoloGame()}
+      }
+      else if(this.state.privateGame){
+        playAgain = () =>{this.findPrivateGame()}
+      }
+      else{
+        playAgain = () => {this.findGame()}
+      }
       return (
         <div className="App">
           <Game 
             soloGame ={this.state.soloGame}
-            playAgain={()=>{this.state.soloGame ? this.soloGame() : this.findGame() }}
+            playAgain={playAgain}
             words={this.state.words} 
             socket={this.state.socket}
             leaveGame={()=>this.leaveGame()}  
@@ -94,9 +110,9 @@ class App extends Component {
       return (
         <div className="App">
           <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
-          <button onClick={this.soloGame.bind(this)}>Play Solo</button>
+          <button onClick={this.findSoloGame.bind(this)}>Play Solo</button>
           <div>
-            <form onSubmit={this.joinPrivate.bind(this)}>
+            <form onSubmit={this.joinPrivateRoom.bind(this)}>
               <label>Join a private Room</label>
               <input id='privateRoom' placeholder="room name"></input>
               <button type="submit">Join</button>
