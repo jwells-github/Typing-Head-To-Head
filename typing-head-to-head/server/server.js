@@ -10,6 +10,9 @@ const fs = require('fs');
 const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 
 io.on('connection', (socket) => { 
+  socket.wins = 0;
+  socket.losses = 0;
+  socket.recordWPM = 0;
   socket.on('setUsername', (username) =>{
     socket.username = username;
   })
@@ -18,6 +21,10 @@ io.on('connection', (socket) => {
   })
   socket.on('complete', function(){
     io.emit('endRace', socket.id);
+  })
+  socket.on('raceStats', (raceWPM,isRaceWinner) =>{
+    socket.recordWPM = raceWPM > socket.recordWPM ? raceWPM : socket.recordWPM;
+    isRaceWinner ? socket.wins++ : socket.losses++
   })
   socket.on('leavePrivateRoom', (privateRoom) =>{
     socket.leave(privateRoom);
@@ -57,12 +64,27 @@ async function matchUsers(room){
   playerTwo.leave(room);
   playerOne.join(gameRoom);
   playerTwo.join(gameRoom);
-  startGame(gameRoom)
+  let gameData = {
+    playerOne: {
+      id: playerOne.id,
+      username: playerOne.username,
+      recordWPM: playerOne.recordWPM,
+      winLoss:  playerOne.wins + " Wins :" + playerOne.losses + " Losses"
+    },
+    playerTwo: {      
+      id: playerTwo.id,
+      username: playerTwo.username,
+      recordWPM: playerTwo.recordWPM,
+      winLoss:  playerTwo.wins + " Wins :" + playerTwo.losses + " Losses"
+    }
+  }
+  startGame(gameRoom, gameData)
 }
 
-async function startGame(gameRoom){
+async function startGame(gameRoom, gameData = {}){
   let passage = await getPassage();
-  io.to(gameRoom).emit('gameReady', passage)
+  gameData.passage = passage
+  io.to(gameRoom).emit('gameReady', gameData)
   let countDownLength = 5;
   let countDown = setInterval(() => {
     if(countDownLength < 1){

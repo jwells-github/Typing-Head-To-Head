@@ -10,7 +10,7 @@ class Game extends Component {
   constructor(props){
     super(props);
     this.state = {
-      words: this.props.words,
+      words: this.props.gameData.passage.text.split(' '),
       playerPosition : 0,
       opponentPosition: 0,
       gameCountDown: 5,
@@ -32,6 +32,7 @@ class Game extends Component {
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
       let isWinner = this.props.socket.id === winnerID
+      this.props.socket.emit('raceStats', this.calculateWPM(this.state.playerPosition), isWinner)
       if(this._isMounted){
         this.setState({
           typingFinished: true, 
@@ -98,7 +99,7 @@ class Game extends Component {
     // Final word
     if(this.state.playerPosition +1 >= this.state.words.length){
       if(input === currentWord){
-        this.props.socket.emit('complete', this.state.typingTimer);
+        this.props.socket.emit('complete');
         this.setState({
           playerPosition: this.state.playerPosition +1,
           typingFinished: true,
@@ -131,6 +132,8 @@ class Game extends Component {
 
   render(){
     let topDisplay = <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>;
+    let userData = this.props.gameData.playerOne.id === this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
+    let opponentData = this.props.gameData.playerOne.id !== this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
     if(!this.state.gameStarted){
       topDisplay = <h1>Game starting in {this.state.gameCountDown}  </h1>
     }
@@ -140,15 +143,22 @@ class Game extends Component {
         <div className="Players">
           <Player 
             opponent={false} 
+            username={this.props.username}
             wpm={this.state.playerWPM} 
+            recordWPM={userData.recordWPM}
+            winLoss={userData.winLoss}
             progress={this.state.playerPosition}
             words={this.state.words}/>
           <Player 
-            soloGame ={this.props.soloGame}
             opponent={true} 
+            username={opponentData.username}
+            recordWPM={opponentData.recordWPM}
+            winLoss={opponentData.winLoss}
             wpm={this.state.opponentWPM} 
             progress={this.state.opponentPosition}
-            words={this.state.words}/>
+            words={this.state.words}
+            soloGame={this.props.soloGame}
+            />
         </div>
         <div>
           <GameInput

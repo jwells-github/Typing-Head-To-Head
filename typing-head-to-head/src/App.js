@@ -7,21 +7,21 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      socket : socketIOClient(),
+      socket: socketIOClient(),
       username: '',
       searchingForGame: false,
       soloGame: false,
       privateGame: false,
       privateRoom: '',
       gameMatched:false,
-      words: []
+      gameData: {}
     }
   }
   componentDidMount(){
-    this.state.socket.on('gameReady', function(words){
+    this.state.socket.on('gameReady', function(gameData){
       this.setState({
         gameMatched:true,
-        words:words.text.split(' '),
+        gameData: gameData,
         searchingForGame: false
       })
     }.bind(this))
@@ -114,7 +114,8 @@ class App extends Component {
           <Game 
             soloGame ={this.state.soloGame}
             playAgain={playAgain}
-            words={this.state.words} 
+            username={this.state.username}
+            gameData={this.state.gameData} 
             socket={this.state.socket}
             leaveGame={()=>this.leaveGame()}  
             />
