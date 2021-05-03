@@ -89,12 +89,18 @@ class App extends Component {
   render(){
     if(this.state.username === ''){
       return(
-        <div>
-          <form onSubmit={this.setUsername.bind(this)}>
-            <label>Enter a username</label>
-            <input id='username' placeholder="Username"></input>
-            <button type="submit">Submit</button>
-          </form>
+        <div className="App">
+          <div id="welcomePage">
+            <h1>Typing Head-To-Head</h1>
+            <p>Typing Head-To-Head is a game that can be played solo or against an opponent. Players are given a passage of text and are challenged to type it as quickly as possible</p>
+            <p>Enter a username to play!</p>
+            <div>
+              <form onSubmit={this.setUsername.bind(this)}>
+                <input id='username' placeholder="Your username"></input>
+                <button type="submit">Enter</button>
+              </form>
+            </div>
+          </div>
         </div>
       )
     }
@@ -133,14 +139,41 @@ class App extends Component {
       }
       return (
         <div className="App">
-          <button onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button>
-          <button onClick={this.findSoloGame.bind(this)}>Play Solo</button>
-          <div>
-            <form onSubmit={this.joinPrivateRoom.bind(this)}>
-              <label>Join a private Room</label>
-              <input id='privateRoom' placeholder="room name"></input>
-              <button type="submit">Join</button>
-            </form>
+          <h1>Typing Head-To-Head</h1>
+          <div className="gameModes">
+            <div className="gameMode">
+              <h2>Public Head-To-Head</h2>
+              <div className="gameDescription">
+                <div>
+                  <p>Match against another random player in a head-to-head battle to determine who is the superior typist!</p>
+                  <p>The outcome of games will count towards your total number of Wins and Losses. Your personal best typing speed will also be recorded</p>
+                </div>
+                <button className="playButton" onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
+              </div>
+            </div>
+            <div className="gameMode">
+              <h2>Solo Practice Game</h2>
+              <div className="gameDescription">
+                <div>
+                  <p>Play a game by yourself to hone your typing skills, warm up or just to play without the stress of competition</p>
+                  <p>The outcome of games will <span className="underline">not</span> count towards your total number of Wins and Losses. Your personal best typing speed will <span className="underline">not</span> be recorded</p>
+                </div>
+                <button onClick={this.findSoloGame.bind(this)} className="playButton">Play Solo</button>
+              </div>
+            </div>
+            <div className="gameMode">
+              <h2>Join a Private Gameroom</h2>
+              <div className="gameDescription">
+                <div>
+                  <p>Filter your matchmaking to only play against players in the same private room as you.</p>
+                  <p>The outcome of games will count towards your total number of Wins and Losses. Your personal best typing speed will also be recorded</p>
+                  <form onSubmit={this.joinPrivateRoom.bind(this)}>
+                    <input id='privateRoom' placeholder="Room name"></input>
+                    <button className="playButton" type="submit">Join</button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )
