@@ -32,7 +32,10 @@ class Game extends Component {
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
       let isWinner = this.props.socket.id === winnerID
-      this.props.socket.emit('raceStats', this.calculateWPM(this.state.playerPosition), isWinner)
+      // Do not set user stats after finishing a solo game
+      if(!this.props.soloGame){
+        this.props.socket.emit('raceStats', this.calculateWPM(this.state.playerPosition), isWinner)
+      }
       if(this._isMounted){
         this.setState({
           typingFinished: true, 

@@ -34,7 +34,21 @@ io.on('connection', (socket) => {
     matchUsers(privateRoom)
   })
   socket.on('soloGame', function(){
-    startGame(socket.id)
+    let gameData = {
+      playerOne: {
+        id: socket.id,
+        username: socket.username,
+        recordWPM: socket.recordWPM,
+        winLoss:  socket.wins + " Wins :" + socket.losses + " Losses"
+      },
+      playerTwo: {      
+        id: '',
+        username: '',
+        recordWPM: '',
+        winLoss:  ''
+      }
+    }
+    startGame(socket.id, gameData)
   })
   socket.on('findGame', function() {
     if(socket.rooms.has(PUBLIC_WAITING_ROOM)){
@@ -81,7 +95,7 @@ async function matchUsers(room){
   startGame(gameRoom, gameData)
 }
 
-async function startGame(gameRoom, gameData = {}){
+async function startGame(gameRoom, gameData){
   let passage = await getPassage();
   gameData.passage = passage
   io.to(gameRoom).emit('gameReady', gameData)
