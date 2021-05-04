@@ -30,10 +30,12 @@ io.on('connection', (socket) => {
     socket.leave(privateRoom);
   })
   socket.on('privateGame',(privateRoom) =>{
+    socket.leave(PUBLIC_WAITING_ROOM)
     socket.join(privateRoom);
     matchUsers(privateRoom)
   })
   socket.on('soloGame', function(){
+    socket.leave(PUBLIC_WAITING_ROOM)
     let gameData = {
       playerOne: {
         id: socket.id,
