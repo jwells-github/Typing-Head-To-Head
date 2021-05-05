@@ -72,7 +72,7 @@ class App extends Component {
     this.state.socket.emit("privateGame", room);
   }
 
-  leaveGame(){
+  leaveGame(){  
     if(this.state.privateGame){
       this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
     }
@@ -107,7 +107,7 @@ class App extends Component {
     if(this.state.gameMatched){
       let playAgain;
       if(this.state.soloGame){
-        playAgain = () => {this.findSoloGame()}
+        playAgain = () => {this.state.socket.emit("soloGame")}
       }
       else if(this.state.privateGame){
         playAgain = () =>{this.findPrivateGame(this.state.room)}

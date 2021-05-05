@@ -10,7 +10,6 @@ class Game extends Component {
   constructor(props){
     super(props);
     this.state = {
-      words: this.props.gameData.passage.text.split(' '),
       playerPosition : 0,
       opponentPosition: 0,
       gameCountDown: 5,
@@ -32,7 +31,7 @@ class Game extends Component {
     }.bind(this))
     this.props.socket.on('endRace', function(winnerID){
       let isWinner = this.props.socket.id === winnerID
-      // Do not set user stats after finishing a solo game
+      // Do not update user stats after finishing a solo game
       if(!this.props.soloGame){
         this.props.socket.emit('raceStats', this.calculateWPM(this.state.playerPosition), isWinner)
       }
@@ -40,9 +39,9 @@ class Game extends Component {
         this.setState({
           typingFinished: true, 
           raceWinner : isWinner,
-          opponentPosition: isWinner ? this.state.opponentPosition : this.state.words.length,
+          opponentPosition: isWinner ? this.state.opponentPosition : this._words.length,
           playerWPM: this.calculateWPM(this.state.playerPosition),
-          opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this.state.words.length)
+          opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this._words.length)
         })
       }
     }.bind(this))
@@ -75,11 +74,14 @@ class Game extends Component {
   componentWillUnmount(){
     clearInterval(this.timer)
     this._isMounted = false;
+    this.props.socket.off('updateOpponentPosition');
+    this.props.socket.off('endRace');
+    this.props.socket.off('countdown');
   }
 
   calculateWPM(position){
     let typingTime = Date.now()
-    let standardisedWordCount = this.state.words.slice(0,position).join(' ').length / avgCharactersInWord
+    let standardisedWordCount = this._words.slice(0,position).join(' ').length / avgCharactersInWord
     let wpm = Math.round(standardisedWordCount / ((typingTime - this.state.typingStartTime ) / 60000))
     return wpm
   }
@@ -87,7 +89,7 @@ class Game extends Component {
   compareInput(event){
     let input = event.target.value
     let inputChar = input.substring(event.target.value.length-1,input.length)
-    let currentWord = this.state.words[this.state.playerPosition]
+    let currentWord = this._words[this.state.playerPosition]
     if(inputChar === " "){
       if(input.substring(0,input.length-1) === currentWord){
         event.target.value = ""
@@ -100,7 +102,7 @@ class Game extends Component {
       }
     }
     // Final word
-    if(this.state.playerPosition +1 >= this.state.words.length){
+    if(this.state.playerPosition +1 >= this._words.length){
       if(input === currentWord){
         this.props.socket.emit('complete');
         this.setState({
@@ -124,54 +126,71 @@ class Game extends Component {
     return (seconds === 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
   }
 
-  getPassage(){
-    return new Promise((resolve,reject) =>{
-      fetch('/test/')
-      .then(res => {
-        resolve(res.json())
-      })
+  playAgain(){
+    this.setState({
+      playerPosition : 0,
+      opponentPosition: 0,
+      gameCountDown: 5,
+      gameStarted : false,
+      typingFinished: false,
+      raceWinner: false,
+      typingStartTime : 0,
+      typingEndTime: 0,
+      typingTimer: 0,
+      playerWPM: 0,
+      opponentWPM: 0,
     })
+    this.props.playAgain()
   }
 
   render(){
+    this._words = this.props.gameData.passage.text.split(' ');
+    this._userData = this.props.gameData.playerOne.id === this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
+    this._opponentData = this.props.gameData.playerOne.id !== this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
+
     let topDisplay = <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>;
-    let userData = this.props.gameData.playerOne.id === this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
-    let opponentData = this.props.gameData.playerOne.id !== this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
     if(!this.state.gameStarted){
       topDisplay = <h1>Game starting in {this.state.gameCountDown}  </h1>
     }
     return (
       <div className="Game">
         {topDisplay}
-        <div className="Players">
-          <Player 
-            opponent={false} 
-            username={this.props.username}
-            wpm={this.state.playerWPM} 
-            recordWPM={userData.recordWPM}
-            winLoss={userData.winLoss}
-            progress={this.state.playerPosition}
-            words={this.state.words}/>
-          <Player 
-            opponent={true} 
-            username={opponentData.username}
-            recordWPM={opponentData.recordWPM}
-            winLoss={opponentData.winLoss}
-            wpm={this.state.opponentWPM} 
-            progress={this.state.opponentPosition}
-            words={this.state.words}
-            soloGame={this.props.soloGame}
-            />
-        </div>
-        <div>
-          <GameInput
-            typingFinished={this.state.typingFinished}
-            raceWinner={this.state.raceWinner}
-            playAgain={this.props.playAgain}
-            leaveGame={this.props.leaveGame}
-            gameStarted={this.state.gameStarted}
-            compareInput ={this.compareInput.bind(this)}
-          />
+        <div className="players">
+          <div class="playerOne">
+            <Player 
+              opponent={false} 
+              username={this.props.username}
+              wpm={this.state.playerWPM} 
+              recordWPM={this._userData.recordWPM}
+              winLoss={this._userData.winLoss}
+              progress={this.state.playerPosition}
+              words={this._words}/>
+            <div>
+              <GameInput
+                typingFinished={this.state.typingFinished}
+                raceWinner={this.state.raceWinner}
+                playAgain={this.playAgain.bind(this)}
+                leaveGame={this.props.leaveGame}
+                gameStarted={this.state.gameStarted}
+                compareInput ={this.compareInput.bind(this)}
+              />
+            </div>
+          </div>
+          <div>
+            {this.props.soloGame ? <span></span> : <span className="versus">VS</span>}
+          </div>
+          <div className={this.props.soloGame ? "" : "playerTwo"}>
+            <Player 
+              opponent={true} 
+              username={this._opponentData.username}
+              recordWPM={this._opponentData.recordWPM}
+              winLoss={this._opponentData.winLoss}
+              wpm={this.state.opponentWPM} 
+              progress={this.state.opponentPosition}
+              words={this._words}
+              soloGame={this.props.soloGame}
+              />
+          </div>
         </div>
       </div>
     )
