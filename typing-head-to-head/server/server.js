@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
         id: socket.id,
         username: socket.username,
         recordWPM: socket.recordWPM,
-        winLoss:  socket.wins + " Wins :" + socket.losses + " Losses"
+        winLoss:  socket.wins + " Wins : " + socket.losses + " Losses"
       },
       playerTwo: {      
         id: '',
@@ -85,13 +85,13 @@ async function matchUsers(room){
       id: playerOne.id,
       username: playerOne.username,
       recordWPM: playerOne.recordWPM,
-      winLoss:  playerOne.wins + " Wins :" + playerOne.losses + " Losses"
+      winLoss:  playerOne.wins + " Wins : " + playerOne.losses + " Losses"
     },
     playerTwo: {      
       id: playerTwo.id,
       username: playerTwo.username,
       recordWPM: playerTwo.recordWPM,
-      winLoss:  playerTwo.wins + " Wins :" + playerTwo.losses + " Losses"
+      winLoss:  playerTwo.wins + " Wins : " + playerTwo.losses + " Losses"
     }
   }
   startGame(gameRoom, gameData)
@@ -101,7 +101,7 @@ async function startGame(gameRoom, gameData){
   let passage = await getPassage();
   gameData.passage = passage
   io.to(gameRoom).emit('gameReady', gameData)
-  let countDownLength = 5;
+  let countDownLength = 4;
   let countDown = setInterval(() => {
     if(countDownLength < 1){
       clearInterval(countDown)
