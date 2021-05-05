@@ -156,7 +156,7 @@ class Game extends Component {
       <div className="Game">
         {topDisplay}
         <div className="players">
-          <div class="playerOne">
+          <div className="playerOne">
             <Player 
               opponent={false} 
               username={this.props.username}
