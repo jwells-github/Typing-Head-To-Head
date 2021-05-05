@@ -7,14 +7,18 @@ class Player extends Component {
       return(<div></div>)
     }
     return(
-      <div className={!this.props.opponent ? "PlayerOne" : "PlayerTwo"}>
-        <h2>{!this.props.opponent ? "You" : "Your opponent"}</h2>
-        <h3>{this.props.username}</h3>
-        <h4>Record WPM {this.props.recordWPM}</h4>
-        <h4>{this.props.winLoss}</h4>
+      <div>
+      <div>
+        <h2>{this.props.username}</h2>
+        <div className="playerStatistics">
+          <span>{this.props.winLoss}</span>
+          <span>Record WPM {this.props.recordWPM}</span>
+        </div>
+        <h2>{this.props.wpm} WPM</h2>
+      </div>
         <div>
-          <h2>{this.props.wpm} WPM</h2>
-          <TypingProgress words={this.props.words} progress={this.props.progress}/>
+
+          <TypingProgress opponent={this.props.opponent} words={this.props.words} progress={this.props.progress}/>
         </div>
     </div>
     )

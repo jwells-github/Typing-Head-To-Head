@@ -66,17 +66,49 @@
   border-bottom: 1px dotted black;
 }
 
-.Players{
+.players{
   display:flex;
 }
-.PlayerOne, .PlayerTwo{
+.players h2{
+  font-size: 2em;
+  margin:0;
+}
+.playerOne, .playerTwo{
   flex-grow: 1;
 }
-.TypingInput{
-  width:50%;
-  height: 20px;
+.playerTwo{
+  border-left: 1px solid black;
 }
+.playerStatistics{
+  display: flex;
+  justify-content: center;
+  flex-wrap:wrap;
+}
+.playerStatistics span{
+  margin: 1em;
+}
+.versus{
+  position:absolute;
+  background: white;
+  color: crimson;
+  font-size: 3em;
+  font-weight: 500;
+  margin-left: -.56em;
 
+}
+#TypingInput{
+  max-width: 80%;
+  box-sizing: border-box;
+  font-size: 2em;
+  text-align: center;
+}
+.gameFinishedDialogue button{
+  padding: 1em;
+  font-size: .8em;
+  margin-left: 1em;
+  width: 8em;
+  height: 4em;
+}
 .App {
   text-align: center;
 }

@@ -4,8 +4,8 @@ class GameInput extends Component {
   render(){
     if(this.props.typingFinished){  
       return(
-        <div>
-          <h1>{this.props.raceWinner ? "win" : "lose"}</h1>
+        <div className="gameFinishedDialogue">
+          <h1>{this.props.raceWinner ? "You win!" : "You lose"}</h1>
           <button onClick={this.props.playAgain}>Play again</button>
           <button onClick={this.props.leaveGame}>Leave game</button>
         </div>

@@ -8,7 +8,7 @@ class TypingProgress extends Component {
       if(i < this.props.progress ){
         itemClass += "completedWord"
       }
-      else if(i === this.props.progress ){
+      else if(i === this.props.progress && !this.props.opponent){
         itemClass += "currentWord"
       }
       wordList.push(<li className={itemClass} key={i}>{this.props.words[i]}</li>)
