@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import Game from './Game';
 import './App.css';
 import socketIOClient from "socket.io-client";
+import WelcomePage from './WelcomePage';
 
 class App extends Component {
   constructor(props){
@@ -43,13 +44,10 @@ class App extends Component {
   joinPrivateRoom(event){
     event.preventDefault();
     let roomInput = document.getElementById("privateRoom");
-    if(roomInput.value.trim() === ''){
-      return;
-    }
     this.setState({
       gameMatched: false,
       privateGame: true,
-      privateRoom: roomInput.value.trim(),
+      privateRoom: roomInput.value,
       searchingForGame: false,
       soloGame: false,
     })
@@ -57,15 +55,7 @@ class App extends Component {
     roomInput.value = "";
   }
 
-  
-  setUsername(event){
-    event.preventDefault();
-    let usernameInput = document.getElementById("username");
-    this.setState({
-      username: usernameInput.value
-    })
-    this.state.socket.emit("setUsername", usernameInput.value);
-  }
+
 
   findPrivateGame(room){
     this.setState({
@@ -92,19 +82,9 @@ class App extends Component {
   render(){
     if(this.state.username === ''){
       return(
-        <div className="App">
-          <div id="welcomePage">
-            <h1>Typing Head-To-Head</h1>
-            <p>Typing Head-To-Head is a game that can be played solo or against an opponent. Players are given a passage of text and are challenged to type it as quickly as possible</p>
-            <p>Enter a username to play!</p>
-            <div>
-              <form onSubmit={this.setUsername.bind(this)}>
-                <input id='username' placeholder="Your username"></input>
-                <button type="submit">Enter</button>
-              </form>
-            </div>
-          </div>
-        </div>
+        <WelcomePage 
+          storeUsername={(username) => this.setState({username:username})}
+          socket={this.state.socket}/>
       )
     }
     if(this.state.gameMatched){
