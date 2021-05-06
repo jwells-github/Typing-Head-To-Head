@@ -43,13 +43,13 @@ class App extends Component {
   joinPrivateRoom(event){
     event.preventDefault();
     let roomInput = document.getElementById("privateRoom");
-    if(roomInput.value === ''){
+    if(roomInput.value.trim() === ''){
       return;
     }
     this.setState({
       gameMatched: false,
       privateGame: true,
-      privateRoom: roomInput.value,
+      privateRoom: roomInput.value.trim(),
       searchingForGame: false,
       soloGame: false,
     })
