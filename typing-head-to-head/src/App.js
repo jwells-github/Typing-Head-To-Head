@@ -59,6 +59,17 @@ class App extends Component {
       words: []
     })
   }
+  playAgain(){
+    if(this.state.soloGame){
+      this.state.socket.emit("soloGame")
+    }
+    else if(this.state.privateGame){
+      this.findPrivateGame(this.state.privateRoom)
+    }
+    else{
+      this.findGame()
+    }
+  }
 
   render(){
     if(this.state.username === ''){
@@ -69,21 +80,11 @@ class App extends Component {
       )
     }
     if(this.state.gameMatched){
-      let playAgain;
-      if(this.state.soloGame){
-        playAgain = () => {this.state.socket.emit("soloGame")}
-      }
-      else if(this.state.privateGame){
-        playAgain = () =>{this.findPrivateGame(this.state.privateRoom)}
-      }
-      else{
-        playAgain = () => {this.findGame()}
-      }
       return (
         <div className="App">
           <Game 
             soloGame ={this.state.soloGame}
-            playAgain={playAgain}
+            playAgain={()=>this.playAgain()}
             username={this.state.username}
             gameData={this.state.gameData} 
             socket={this.state.socket}
