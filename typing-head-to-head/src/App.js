@@ -4,6 +4,7 @@ import './App.css';
 import socketIOClient from "socket.io-client";
 import WelcomePage from './WelcomePage';
 import ModeSelection from './ModeSelection';
+import PrivateRoom from './PrivateRoom';
 
 class App extends Component {
   constructor(props){
@@ -37,19 +38,21 @@ class App extends Component {
     this.state.socket.emit("soloGame")
   }
 
-  findPrivateGame(room){
+  joinPrivateRoom(room){
     this.setState({
       gameMatched: false,
       privateGame: true,
       privateRoom: room,
     })
-    this.state.socket.emit("privateGame", room);
+  }
+  leavePrivateRoom(room){
+    this.state.socket.emit('leavePrivateRoom', room)
+  }
+  findPrivateGame(){  
+    this.state.socket.emit("findPrivateGame", this.state.privateRoom);
   }
 
   leaveGame(){  
-    if(this.state.privateGame){
-      this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
-    }
     this.setState({
       //searchingForGame: false,
       soloGame: false,
@@ -96,10 +99,12 @@ class App extends Component {
     else{
       if(this.state.privateGame){
         return(
-          <div>
-            <h1>You are waiting for a game in private room: {this.state.privateRoom}</h1>
-            <button onClick={this.leaveGame.bind(this)}>Leave {this.state.privateRoom}</button>
-          </div>
+          <PrivateRoom
+            socket = {this.state.socket}
+            privateRoom = {this.state.privateRoom}
+            findPrivateGame = {()=>this.findPrivateGame()}
+            leaveGame = {()=>this.leaveGame()}
+          />
         )
       }
       return (
@@ -108,7 +113,7 @@ class App extends Component {
             socket={this.state.socket}
             findGame ={()=>this.findGame()}
             findSoloGame={()=>this.findSoloGame()}
-            findPrivateGame={(room)=>this.findPrivateGame(room)}/>
+            joinPrivateRoom={(room)=>this.joinPrivateRoom(room)}/>
         </div>
       )
     }
