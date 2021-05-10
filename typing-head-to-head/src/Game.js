@@ -147,6 +147,7 @@ class Game extends Component {
     this._words = this.props.gameData.passage.text.split(' ');
     this._userData = this.props.gameData.playerOne.id === this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
     this._opponentData = this.props.gameData.playerOne.id !== this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
+    this._passageTitle = this.props.gameData.passage.title;
 
     let topDisplay = <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>;
     if(!this.state.gameStarted){
@@ -164,7 +165,10 @@ class Game extends Component {
               recordWPM={this._userData.recordWPM}
               winLoss={this._userData.winLoss}
               progress={this.state.playerPosition}
-              words={this._words}/>
+              words={this._words}
+              passageTitle = {this._passageTitle}
+              typingFinished = {this.state.typingFinished}
+              />
             <div>
               <GameInput
                 typingFinished={this.state.typingFinished}

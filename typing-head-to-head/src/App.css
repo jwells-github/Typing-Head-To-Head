@@ -96,6 +96,13 @@
   margin-left: -.56em;
 
 }
+.typingProgress ul{
+  margin-bottom:.5em;
+}
+.passageTitle{
+  font-size: .8em;
+  font-style: italic;
+}
 #TypingInput{
   max-width: 80%;
   box-sizing: border-box;
