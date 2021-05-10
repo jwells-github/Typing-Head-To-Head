@@ -3,6 +3,7 @@ import Game from './Game';
 import './App.css';
 import socketIOClient from "socket.io-client";
 import WelcomePage from './WelcomePage';
+import ModeSelection from './ModeSelection';
 
 class App extends Component {
   constructor(props){
@@ -10,7 +11,6 @@ class App extends Component {
     this.state = {
       socket: socketIOClient(),
       username: '',
-      searchingForGame: false,
       soloGame: false,
       privateGame: false,
       privateRoom: '',
@@ -23,11 +23,7 @@ class App extends Component {
       this.setState({
         gameMatched:true,
         gameData: gameData,
-        searchingForGame: false
       })
-    }.bind(this))
-    this.state.socket.on('inWaiting', function(isWaiting){
-      this.setState({searchingForGame : isWaiting})
     }.bind(this))
   }
 
@@ -41,26 +37,11 @@ class App extends Component {
     this.state.socket.emit("soloGame")
   }
 
-  joinPrivateRoom(event){
-    event.preventDefault();
-    let roomInput = document.getElementById("privateRoom");
-    this.setState({
-      gameMatched: false,
-      privateGame: true,
-      privateRoom: roomInput.value,
-      searchingForGame: false,
-      soloGame: false,
-    })
-    this.findPrivateGame(roomInput.value);
-    roomInput.value = "";
-  }
-
-
-
   findPrivateGame(room){
     this.setState({
       gameMatched: false,
       privateGame: true,
+      privateRoom: room,
     })
     this.state.socket.emit("privateGame", room);
   }
@@ -70,7 +51,7 @@ class App extends Component {
       this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
     }
     this.setState({
-      searchingForGame: false,
+      //searchingForGame: false,
       soloGame: false,
       privateGame: false,
       privateRoom: '',
@@ -93,7 +74,7 @@ class App extends Component {
         playAgain = () => {this.state.socket.emit("soloGame")}
       }
       else if(this.state.privateGame){
-        playAgain = () =>{this.findPrivateGame(this.state.room)}
+        playAgain = () =>{this.findPrivateGame(this.state.privateRoom)}
       }
       else{
         playAgain = () => {this.findGame()}
@@ -122,42 +103,11 @@ class App extends Component {
       }
       return (
         <div className="App">
-          <h1>Typing Head-To-Head</h1>
-          <div className="gameModes">
-            <div className="gameMode">
-              <h2>Public Head-To-Head</h2>
-              <div className="gameDescription">
-                <div>
-                  <p>Match against another random player in a head-to-head battle to determine who is the superior typist!</p>
-                  <p>The outcome of games will count towards your total number of Wins and Losses. Your personal best typing speed will also be recorded</p>
-                </div>
-                <button className="playButton" onClick={this.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
-              </div>
-            </div>
-            <div className="gameMode">
-              <h2>Solo Practice Game</h2>
-              <div className="gameDescription">
-                <div>
-                  <p>Play a game by yourself to hone your typing skills, warm up or just to play without the stress of competition</p>
-                  <p>The outcome of games will <span className="underline">not</span> count towards your total number of Wins and Losses. Your personal best typing speed will <span className="underline">not</span> be recorded</p>
-                </div>
-                <button onClick={this.findSoloGame.bind(this)} className="playButton">Play Solo</button>
-              </div>
-            </div>
-            <div className="gameMode">
-              <h2>Join a Private Gameroom</h2>
-              <div className="gameDescription">
-                <div>
-                  <p>Filter your matchmaking to only play against players in the same private room as you.</p>
-                  <p>The outcome of games will count towards your total number of Wins and Losses. Your personal best typing speed will also be recorded</p>
-                  <form onSubmit={this.joinPrivateRoom.bind(this)}>
-                    <input id='privateRoom' placeholder="Room name"></input>
-                    <button className="playButton" type="submit">Join</button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ModeSelection 
+            socket={this.state.socket}
+            findGame ={()=>this.findGame()}
+            findSoloGame={()=>this.findSoloGame()}
+            findPrivateGame={(room)=>this.findPrivateGame(room)}/>
         </div>
       )
     }
