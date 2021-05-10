@@ -1,3 +1,6 @@
+.errorMessage{
+  color: red;
+}
 #welcomePage{
   position:fixed;
   top: 40%;

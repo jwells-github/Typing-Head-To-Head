@@ -6,6 +6,7 @@ class ModeSelection extends Component {
     super(props);
     this.state = {
       searchingForGame: false,
+      privateRoomNameError: false,
     }
   }
   componentDidMount(){
@@ -23,8 +24,23 @@ class ModeSelection extends Component {
     if(roomInput.value.trim() === ""){
       return;
     }    
-    this.props.findPrivateGame(roomInput.value.trim());
+    if(this.isIllegalRoomName(roomInput.value.trim())){
+      this.setState({privateRoomNameError: true})
+      return;
+    }
+    this.props.joinPrivateRoom(roomInput.value.trim());
     roomInput.value = "";
+  }
+
+  isIllegalRoomName(room){
+    var matchesPublicWaitingRoom = /\bpublicWaitingRoom\b/.test(room)
+    var matchesMatchmaking = /-MATCHMAKING$/.test(room)
+    if(matchesPublicWaitingRoom || matchesMatchmaking){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   render(){
@@ -61,6 +77,7 @@ class ModeSelection extends Component {
                 <form onSubmit={this.joinPrivateRoom.bind(this)}>
                   <input id='privateRoom' placeholder="Room name"></input>
                   <button className="playButton" type="submit">Join</button>
+                  {this.state.privateRoomNameError ? <span className="errorMessage">Your room name contains a reserved phrase. Please select a new name</span> : ''}
                 </form>
               </div>
             </div>
