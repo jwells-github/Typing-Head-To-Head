@@ -6,12 +6,17 @@ class PrivateRoom extends Component {
     super(props);
     this.state = {
       searchingForGame: false,
+      playersInRoom: 0
     }
   }
 
   componentDidMount(){
     this.props.socket.on('inWaiting', function(isWaiting){
       this.setState({searchingForGame : isWaiting})
+    }.bind(this))
+    this.props.socket.on('privateRoomSize', function(size){
+      console.log(size)
+      this.setState({playersInRoom : size})
     }.bind(this))
   }
   componentWillUnmount(){
@@ -21,7 +26,8 @@ class PrivateRoom extends Component {
   render(){
     return(  
       <div>
-        <h1>You are waiting for a game in private room: {this.props.privateRoom}</h1>
+        <h1>Private Room: {this.props.privateRoom}</h1>
+        <h2>There is currently {this.state.playersInRoom} {this.state.playersInRoom === 1 ? 'user' : 'users'} in this room</h2>
         <button onClick={this.props.findPrivateGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
         <button onClick={this.props.leaveGame.bind(this)}>Leave private room</button>
       </div>

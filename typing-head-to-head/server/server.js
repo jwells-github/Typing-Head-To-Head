@@ -8,7 +8,7 @@ const io = require('socket.io')(server);
 const fs = require('fs');
 
 const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
-
+const MATCHMAKING_ROOM_SUFFIX = '-MATCHMAKING';
 io.on('connection', (socket) => { 
   socket.wins = 0;
   socket.losses = 0;
@@ -26,13 +26,26 @@ io.on('connection', (socket) => {
     socket.recordWPM = raceWPM > socket.recordWPM ? raceWPM : socket.recordWPM;
     isRaceWinner ? socket.wins++ : socket.losses++
   })
+  socket.on('joinPrivateRoom', (privateRoom) =>{
+    socket.leave(PUBLIC_WAITING_ROOM)
+    socket.join(privateRoom);
+    console.log('hello')
+    io.in(privateRoom).emit('privateRoomSize', io.sockets.adapter.rooms.get(privateRoom).size)
+    console.log(io.sockets.adapter.rooms.get(privateRoom).size)
+  })
   socket.on('leavePrivateRoom', (privateRoom) =>{
     socket.leave(privateRoom);
   })
-  socket.on('privateGame',(privateRoom) =>{
-    socket.leave(PUBLIC_WAITING_ROOM)
-    socket.join(privateRoom);
-    matchUsers(privateRoom)
+  socket.on('findPrivateGame',(privateRoom) =>{
+    let room = privateRoom + MATCHMAKING_ROOM_SUFFIX
+    if(socket.rooms.has(room)){
+      socket.leave(room)
+      socket.emit('inWaiting', false)
+      return;
+    }
+    socket.emit('inWaiting', true)
+    socket.join(room)
+    matchUsers(room)
   })
   socket.on('soloGame', function(){
     socket.leave(PUBLIC_WAITING_ROOM)
