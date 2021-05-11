@@ -9,46 +9,35 @@ const fs = require('fs');
 
 const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 const MATCHMAKING_ROOM_SUFFIX = '-MATCHMAKING';
+let numberOfUsersInPublicRoom;
 io.on('connection', (socket) => { 
   socket.wins = 0;
   socket.losses = 0;
   socket.recordWPM = 0;
   socket.on('setUsername', (username) =>{
     socket.username = username;
+    socket.join(PUBLIC_WAITING_ROOM);
+    numberOfUsersInPublicRoom = io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size
+    io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', numberOfUsersInPublicRoom)
   })
   socket.on('word', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
   socket.on('complete', function(){
     io.emit('endRace', socket.id);
+    io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size)
   })
   socket.on('raceStats', (raceWPM,isRaceWinner) =>{
     socket.recordWPM = raceWPM > socket.recordWPM ? raceWPM : socket.recordWPM;
     isRaceWinner ? socket.wins++ : socket.losses++
   })
   socket.on('joinPrivateRoom', (privateRoom) =>{
-    socket.leave(PUBLIC_WAITING_ROOM)
+    socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
     socket.join(privateRoom);
-    console.log('hello')
     io.in(privateRoom).emit('privateRoomSize', io.sockets.adapter.rooms.get(privateRoom).size)
-    console.log(io.sockets.adapter.rooms.get(privateRoom).size)
-  })
-  socket.on('leavePrivateRoom', (privateRoom) =>{
-    socket.leave(privateRoom);
-  })
-  socket.on('findPrivateGame',(privateRoom) =>{
-    let room = privateRoom + MATCHMAKING_ROOM_SUFFIX
-    if(socket.rooms.has(room)){
-      socket.leave(room)
-      socket.emit('inWaiting', false)
-      return;
-    }
-    socket.emit('inWaiting', true)
-    socket.join(room)
-    matchUsers(room)
   })
   socket.on('soloGame', function(){
-    socket.leave(PUBLIC_WAITING_ROOM)
+    socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
     let gameData = {
       playerOne: {
         id: socket.id,
@@ -65,17 +54,29 @@ io.on('connection', (socket) => {
     }
     startGame(socket.id, gameData)
   })
-  socket.on('findGame', function() {
-    if(socket.rooms.has(PUBLIC_WAITING_ROOM)){
-      socket.leave(PUBLIC_WAITING_ROOM)
+  socket.on('matchmakeMe', function(roomName){
+    let room = roomName;
+    if(room === ''){
+      room = PUBLIC_WAITING_ROOM
+    }
+    room += MATCHMAKING_ROOM_SUFFIX
+    if(socket.rooms.has(room)){
+      socket.leave(room)
       socket.emit('inWaiting', false)
       return;
     }
     socket.emit('inWaiting', true)
-    socket.join(PUBLIC_WAITING_ROOM)
-    matchUsers(PUBLIC_WAITING_ROOM)
+    socket.join(room)
+    matchUsers(room)
+  })
+  socket.on('leavePrivateRoom', (privateRoom) =>{
+    socket.leave(privateRoom);
   })
   socket.on("disconnect", () => {
+    if(socket.username != null){
+      numberOfUsersInPublicRoom --;
+      io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', numberOfUsersInPublicRoom)
+    }
   });
 });
 

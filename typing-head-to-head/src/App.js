@@ -16,7 +16,8 @@ class App extends Component {
       privateGame: false,
       privateRoom: '',
       gameMatched:false,
-      gameData: {}
+      gameData: {},
+      playersInRoom: 0,
     }
   }
   componentDidMount(){
@@ -26,11 +27,14 @@ class App extends Component {
         gameData: gameData,
       })
     }.bind(this))
+    this.state.socket.on('publicRoomSize', function(size){
+      this.setState({playersInRoom : size})
+    }.bind(this))
   }
 
   findGame(){
     this.setState({gameMatched: false})
-    this.state.socket.emit('findGame')
+    this.state.socket.emit('matchmakeMe', '')
   }
 
   findSoloGame(){
@@ -39,6 +43,7 @@ class App extends Component {
   }
 
   joinPrivateRoom(room){
+    this.state.socket.emit('joinPrivateRoom', room)
     this.setState({
       gameMatched: false,
       privateGame: true,
@@ -49,7 +54,7 @@ class App extends Component {
     this.state.socket.emit('leavePrivateRoom', room)
   }
   findPrivateGame(){  
-    this.state.socket.emit("findPrivateGame", this.state.privateRoom);
+    this.state.socket.emit("matchmakeMe", this.state.privateRoom);
   }
 
   leaveGame(){  
@@ -111,6 +116,7 @@ class App extends Component {
         <div className="App">
           <ModeSelection 
             socket={this.state.socket}
+            playersInRoom ={this.state.playersInRoom}
             findGame ={()=>this.findGame()}
             findSoloGame={()=>this.findSoloGame()}
             joinPrivateRoom={(room)=>this.joinPrivateRoom(room)}/>
