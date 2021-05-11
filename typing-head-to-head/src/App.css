@@ -49,6 +49,44 @@
   display:inline-block;
   border-bottom: 1px solid black;
 }
+.chatbox{
+  margin-top: .5em
+}
+.chatbox form{
+  display:flex
+}
+.chatbox input{
+  font-size:1.3em;
+}
+.chatbox button{
+  font-size: 1em;
+}
+#chatInput{
+  flex-grow: 1;
+}
+#chatMessages{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  height: 15em;
+  border: 1px solid black;
+  overflow:auto;
+}
+#chatMessages li{
+  overflow-wrap: break-word;
+  margin-left: .2em;
+}
+.systemChatMessage{
+  display:inline-block;
+  font-weight:500;
+  border-bottom:1px dotted black;
+}
+.chatUsername{
+  font-weight: 600;
+}
+.chatMessage{
+  margin-left:.3em;
+}
 .underline{
   text-decoration: underline;
 }

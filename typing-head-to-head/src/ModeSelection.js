@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Chatbox from './Chatbox'
 
 class ModeSelection extends Component {
 
@@ -59,6 +60,11 @@ class ModeSelection extends Component {
               </div>
               <button className="playButton" onClick={this.props.findGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
             </div>
+            <Chatbox 
+              socket={this.props.socket}
+              username={this.props.username}
+              roomName={''} // Empty string signifies public room
+            />
           </div>
           <div className="gameMode">
             <h2>Solo Practice Game</h2>

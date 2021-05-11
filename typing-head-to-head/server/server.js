@@ -1,4 +1,3 @@
-const { json, response } = require("express");
 const express = require("express");
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -10,6 +9,7 @@ const fs = require('fs');
 const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 const MATCHMAKING_ROOM_SUFFIX = '-MATCHMAKING';
 let numberOfUsersInPublicRoom;
+
 io.on('connection', (socket) => { 
   socket.wins = 0;
   socket.losses = 0;
@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
   socket.on('word', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
-  socket.on('complete', function(){
+  socket.on('complete', () => {
     io.emit('endRace', socket.id);
     io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size)
   })
@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
     socket.join(privateRoom);
     io.in(privateRoom).emit('privateRoomSize', io.sockets.adapter.rooms.get(privateRoom).size)
   })
-  socket.on('soloGame', function(){
+  socket.on('soloGame', () => {
     socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
     let gameData = {
       playerOne: {
@@ -54,11 +54,8 @@ io.on('connection', (socket) => {
     }
     startGame(socket.id, gameData)
   })
-  socket.on('matchmakeMe', function(roomName){
-    let room = roomName;
-    if(room === ''){
-      room = PUBLIC_WAITING_ROOM
-    }
+  socket.on('matchmakeMe', (roomName) =>{
+    let room = roomName === '' ? PUBLIC_WAITING_ROOM : roomName;
     room += MATCHMAKING_ROOM_SUFFIX
     if(socket.rooms.has(room)){
       socket.leave(room)
@@ -71,6 +68,10 @@ io.on('connection', (socket) => {
   })
   socket.on('leavePrivateRoom', (privateRoom) =>{
     socket.leave(privateRoom);
+  })
+  socket.on('sendChatMessage', (username,chatMessage,roomName) =>{
+    let room = roomName === '' ? PUBLIC_WAITING_ROOM : roomName;
+    socket.to(room).emit('updateChat',username, chatMessage);
   })
   socket.on("disconnect", () => {
     if(socket.username != null){

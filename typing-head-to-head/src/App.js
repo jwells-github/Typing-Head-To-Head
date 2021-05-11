@@ -116,6 +116,7 @@ class App extends Component {
         <div className="App">
           <ModeSelection 
             socket={this.state.socket}
+            username = {this.state.username}
             playersInRoom ={this.state.playersInRoom}
             findGame ={()=>this.findGame()}
             findSoloGame={()=>this.findSoloGame()}
