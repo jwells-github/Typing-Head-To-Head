@@ -58,6 +58,9 @@ class App extends Component {
   }
 
   leaveGame(){  
+    if(this.state.privateRoom !== ''){
+      this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
+    }
     this.setState({
       //searchingForGame: false,
       soloGame: false,
@@ -106,6 +109,7 @@ class App extends Component {
         return(
           <PrivateRoom
             socket = {this.state.socket}
+            username = {this.state.username}
             privateRoom = {this.state.privateRoom}
             findPrivateGame = {()=>this.findPrivateGame()}
             leaveGame = {()=>this.leaveGame()}

@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Chatbox from './Chatbox'
 
 class PrivateRoom extends Component {
 
@@ -15,7 +16,6 @@ class PrivateRoom extends Component {
       this.setState({searchingForGame : isWaiting})
     }.bind(this))
     this.props.socket.on('privateRoomSize', function(size){
-      console.log(size)
       this.setState({playersInRoom : size})
     }.bind(this))
   }
@@ -30,6 +30,11 @@ class PrivateRoom extends Component {
         <h2>There is currently {this.state.playersInRoom} {this.state.playersInRoom === 1 ? 'user' : 'users'} in this room</h2>
         <button onClick={this.props.findPrivateGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
         <button onClick={this.props.leaveGame.bind(this)}>Leave private room</button>
+        <Chatbox 
+              socket={this.props.socket}
+              username={this.props.username}
+              roomName={this.props.privateRoom} // Empty string signifies public room
+            />
       </div>
     )
   }

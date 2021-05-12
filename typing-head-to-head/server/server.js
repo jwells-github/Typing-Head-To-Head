@@ -32,9 +32,14 @@ io.on('connection', (socket) => {
     isRaceWinner ? socket.wins++ : socket.losses++
   })
   socket.on('joinPrivateRoom', (privateRoom) =>{
+    socket.leave(PUBLIC_WAITING_ROOM);
     socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
     socket.join(privateRoom);
     io.in(privateRoom).emit('privateRoomSize', io.sockets.adapter.rooms.get(privateRoom).size)
+  })
+  socket.on('leavePrivateRoom', (privateRoom) =>{
+    socket.join(PUBLIC_WAITING_ROOM);
+    socket.leave(privateRoom);
   })
   socket.on('soloGame', () => {
     socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
@@ -65,9 +70,6 @@ io.on('connection', (socket) => {
     socket.emit('inWaiting', true)
     socket.join(room)
     matchUsers(room)
-  })
-  socket.on('leavePrivateRoom', (privateRoom) =>{
-    socket.leave(privateRoom);
   })
   socket.on('sendChatMessage', (username,chatMessage,roomName) =>{
     let room = roomName === '' ? PUBLIC_WAITING_ROOM : roomName;
