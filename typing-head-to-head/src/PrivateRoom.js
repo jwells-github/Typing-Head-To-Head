@@ -26,16 +26,24 @@ class PrivateRoom extends Component {
   render(){
     return(  
       <div>
-        <h1>Private Room: {this.props.privateRoom}</h1>
-        <h2>There is currently {this.state.playersInRoom} {this.state.playersInRoom === 1 ? 'user' : 'users'} in this room</h2>
-        <button onClick={this.props.findPrivateGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
-        <button onClick={this.props.leaveGame.bind(this)}>Leave private room</button>
-        <Chatbox 
-              socket={this.props.socket}
-              username={this.props.username}
-              roomName={this.props.privateRoom} // Empty string signifies public room
-            />
+        <div className='gameModes'>
+          <h1>Private Room: {this.props.privateRoom}</h1>
+          <h2>There is currently {this.state.playersInRoom} {this.state.playersInRoom === 1 ? 'user' : 'users'} in this room</h2>
+          <div className='gameMode'>
+            <div class="privateRoomButtons">
+              <button onClick={this.props.findPrivateGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
+              <button onClick={this.props.leaveGame.bind(this)}>Leave private room</button>
+            </div>
+              <Chatbox 
+                    socket={this.props.socket}
+                    username={this.props.username}
+                    roomName={this.props.privateRoom} // Empty string signifies public room
+              />
+          </div>
+
+        </div>
       </div>
+
     )
   }
 }
