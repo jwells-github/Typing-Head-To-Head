@@ -5,7 +5,7 @@ class ChatBox extends Component {
   constructor(props){
     super(props);
     this.state = {
-      chatMessages: [<li className='systemChatMessage'>Welcome to chat room, please be pleasant!</li>],
+      chatMessages: [<li className='systemChatMessage'>Welcome to the chat room, please be pleasant!</li>],
       playersInRoom: 0
     }
   }
