@@ -21,6 +21,7 @@ class PrivateRoom extends Component {
   }
   componentWillUnmount(){
     this.props.socket.off('inWaiting');
+    this.props.socket.off('privateRoomSize');
   }
 
   render(){
@@ -37,13 +38,12 @@ class PrivateRoom extends Component {
               <Chatbox 
                     socket={this.props.socket}
                     username={this.props.username}
-                    roomName={this.props.privateRoom} // Empty string signifies public room
+                    roomName={this.props.privateRoom}
               />
           </div>
 
         </div>
       </div>
-
     )
   }
 }
