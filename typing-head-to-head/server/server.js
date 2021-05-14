@@ -23,7 +23,7 @@ io.on('connection', (socket) => {
   socket.on('wordComplete', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
-  socket.on('complete', () => {
+  socket.on('raceComplete', () => {
     io.emit('endRace', socket.id);
   })
   socket.on('raceStats', (raceWPM,isRaceWinner) =>{

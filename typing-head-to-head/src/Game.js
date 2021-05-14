@@ -104,7 +104,7 @@ class Game extends Component {
     // Final word
     if(this.state.playerPosition +1 >= this._words.length){
       if(input === currentWord){
-        this.props.socket.emit('complete');
+        this.props.socket.emit('raceComplete');
         this.setState({
           playerPosition: this.state.playerPosition +1,
           typingFinished: true,
