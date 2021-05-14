@@ -123,6 +123,8 @@
 }
 .playerOne, .playerTwo{
   flex-grow: 1;
+  margin: 0 auto;
+  max-width: 60vw;
 }
 .playerTwo{
   border-left: 1px solid black;
@@ -156,6 +158,7 @@
   box-sizing: border-box;
   font-size: 2em;
   text-align: center;
+  margin-top: .8em
 }
 .gameFinishedDialogue button{
   padding: 1em;
