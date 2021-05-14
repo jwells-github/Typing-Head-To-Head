@@ -21,22 +21,6 @@ class App extends Component {
       privateChatHistory: []
     }
   }
-  updatePublicChat(username,chatMessage){
-    this.setState({
-      publicChatHistory : this.state.publicChatHistory.concat(this.createChatMessage(username,chatMessage))
-    });
-  }
-  updatePrivateChat(username,chatMessage){
-    this.setState({
-      privateChatHistory : this.state.privateChatHistory.concat(this.createChatMessage(username,chatMessage))
-    });
-  }
-  createChatMessage(username, chatMessage){
-    return         <li key={username+Date.now()}>
-      <span className="chatUsername">{username}:</span>
-      <span className="chatMessage">{chatMessage}</span>
-    </li>
-  }
   componentDidMount(){
     this.state.socket.on('gameReady', function(gameData){
       this.setState({
@@ -57,9 +41,28 @@ class App extends Component {
     }.bind(this))
   }
 
+  updatePublicChat(username,chatMessage){
+    this.setState({
+      publicChatHistory : this.state.publicChatHistory.concat(this.createChatMessage(username,chatMessage))
+    });
+  }
+
+  updatePrivateChat(username,chatMessage){
+    this.setState({
+      privateChatHistory : this.state.privateChatHistory.concat(this.createChatMessage(username,chatMessage))
+    });
+  }
+
+  createChatMessage(username, chatMessage){
+    return         <li key={username+Date.now()}>
+      <span className="chatUsername">{username}:</span>
+      <span className="chatMessage">{chatMessage}</span>
+    </li>
+  }
+
   findGame(){
     this.setState({gameMatched: false})
-    this.state.socket.emit('matchmakeMe', this.state.privateRoom)
+    this.state.socket.emit('toggleMatchmaking', this.state.privateRoom)
   }
 
   findSoloGame(){
@@ -74,6 +77,7 @@ class App extends Component {
       privateRoom: room,
     })
   }
+
   leavePrivateRoom(room){
     this.state.socket.emit('leavePrivateRoom', room)
     this.setState({
@@ -81,6 +85,7 @@ class App extends Component {
       privateChatHistory: []
     })
   }
+
   leaveGame(){  
     this.setState({
       soloGame: false,
@@ -100,9 +105,11 @@ class App extends Component {
   render(){
     if(this.state.username === ''){
       return(
-        <WelcomePage 
-          storeUsername={(username) => this.setState({username:username})}
-          socket={this.state.socket}/>
+        <div className="App">
+          <WelcomePage 
+            storeUsername={(username) => this.setState({username:username})}
+            socket={this.state.socket}/>
+        </div>
       )
     }
     if(this.state.gameMatched){
@@ -121,14 +128,16 @@ class App extends Component {
     else{
       if(this.state.privateRoom !== ''){
         return(
-          <PrivateRoom
-            socket = {this.state.socket}
-            username = {this.state.username}
-            privateRoom = {this.state.privateRoom}
-            findPrivateGame = {()=>this.findGame()}
-            leaveRoom = {()=>this.leavePrivateRoom()}
-            chatMessages ={this.state.privateChatHistory}
-            updateChat ={(username,chatMessage) => this.updatePrivateChat(username,chatMessage)}/>
+          <div className="App">
+            <PrivateRoom
+              socket = {this.state.socket}
+              username = {this.state.username}
+              privateRoom = {this.state.privateRoom}
+              findPrivateGame = {()=>this.findGame()}
+              leaveRoom = {()=>this.leavePrivateRoom()}
+              chatMessages ={this.state.privateChatHistory}
+              updateChat ={(username,chatMessage) => this.updatePrivateChat(username,chatMessage)}/>
+          </div>
         )
       }
       return (

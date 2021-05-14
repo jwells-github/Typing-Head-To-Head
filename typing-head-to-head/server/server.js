@@ -20,9 +20,11 @@ io.on('connection', (socket) => {
     numberOfUsersInPublicRoom = io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size
     io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', numberOfUsersInPublicRoom)
   })
+  // A user in a race completes a word
   socket.on('wordComplete', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
+  // A user in a race completes all their words
   socket.on('raceComplete', () => {
     io.emit('endRace', socket.id);
   })
@@ -58,17 +60,20 @@ io.on('connection', (socket) => {
     }
     startGame(socket.id, gameData)
   })
-  socket.on('matchmakeMe', (roomName) =>{
+  socket.on('toggleMatchmaking', (roomName) =>{
     let room = roomName === '' ? PUBLIC_WAITING_ROOM : roomName;
     room += MATCHMAKING_ROOM_SUFFIX
+    // If already in queue, leave
     if(socket.rooms.has(room)){
       socket.leave(room)
       socket.emit('inWaiting', false)
       return;
     }
-    socket.emit('inWaiting', true)
-    socket.join(room)
-    matchUsers(room)
+    else{
+      socket.emit('inWaiting', true)
+      socket.join(room)
+      matchUsers(room)
+    }
   })
   socket.on('sendChatMessage', (username,chatMessage,roomName) =>{
     if(roomName === ''){
@@ -92,15 +97,19 @@ server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 async function matchUsers(room){
   let sockets = await io.in(room).fetchSockets();
   if(sockets.length < 2){
+    // Not enough players in the queue to start a game
     return
   }
   let playerOne = sockets[0];
   let playerTwo = sockets[1]
-  let gameRoom = playerOne.id + "_" + playerTwo.id;
+  // Remove the players from the queue
   playerOne.leave(room);
   playerTwo.leave(room);
+  // Add players to a gameroom 
+  let gameRoom = playerOne.id + "_" + playerTwo.id;
   playerOne.join(gameRoom);
   playerTwo.join(gameRoom);
+
   let gameData = {
     playerOne: {
       id: playerOne.id,
@@ -122,6 +131,7 @@ async function startGame(gameRoom, gameData){
   let passage = await getPassage();
   gameData.passage = passage
   io.to(gameRoom).emit('gameReady', gameData)
+  // Countdown timer to synchronise the start of the game
   let countDownLength = 4;
   let countDown = setInterval(() => {
     if(countDownLength < 1){
@@ -132,7 +142,7 @@ async function startGame(gameRoom, gameData){
   }, 1000);
 }
 
-
+// Return a random passage from passage.json
 function getPassage(){
   return new Promise(function(resolve,reject){
     fs.readFile('passages.json', (err,data) =>{
