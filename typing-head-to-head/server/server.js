@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
     numberOfUsersInPublicRoom = io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size
     io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', numberOfUsersInPublicRoom)
   })
-  socket.on('word', (currentPosition) =>{
+  socket.on('wordComplete', (currentPosition) =>{
     socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
   })
   socket.on('complete', () => {

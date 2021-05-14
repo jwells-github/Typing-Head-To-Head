@@ -94,7 +94,7 @@ class Game extends Component {
       if(input.substring(0,input.length-1) === currentWord){
         event.target.value = ""
         event.target.style.background = "white"
-        this.props.socket.emit('word', this.state.playerPosition + 1)
+        this.props.socket.emit('wordComplete', this.state.playerPosition + 1)
         this.setState({
           playerPosition: this.state.playerPosition +1,
         })
