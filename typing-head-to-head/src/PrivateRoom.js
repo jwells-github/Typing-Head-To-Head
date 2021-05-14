@@ -33,15 +33,15 @@ class PrivateRoom extends Component {
           <div className='gameMode'>
             <div class="privateRoomButtons">
               <button onClick={this.props.findPrivateGame.bind(this)}>{this.state.searchingForGame ? "Leave queue" : "Find a Game"}</button> 
-              <button onClick={this.props.leaveGame.bind(this)}>Leave private room</button>
+              <button onClick={this.props.leaveRoom.bind(this)}>Leave private room</button>
             </div>
               <Chatbox 
-                    socket={this.props.socket}
-                    username={this.props.username}
-                    roomName={this.props.privateRoom}
-              />
+                socket={this.props.socket}
+                username={this.props.username}
+                chatMessages = {this.props.chatMessages}
+                updateChat ={(username,chatMessage) =>this.props.updateChat(username,chatMessage)}
+                roomName={this.props.privateRoom}/>
           </div>
-
         </div>
       </div>
     )

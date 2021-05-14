@@ -25,7 +25,6 @@ io.on('connection', (socket) => {
   })
   socket.on('complete', () => {
     io.emit('endRace', socket.id);
-    io.in(PUBLIC_WAITING_ROOM).emit('publicRoomSize', io.sockets.adapter.rooms.get(PUBLIC_WAITING_ROOM).size)
   })
   socket.on('raceStats', (raceWPM,isRaceWinner) =>{
     socket.recordWPM = raceWPM > socket.recordWPM ? raceWPM : socket.recordWPM;
@@ -72,8 +71,13 @@ io.on('connection', (socket) => {
     matchUsers(room)
   })
   socket.on('sendChatMessage', (username,chatMessage,roomName) =>{
-    let room = roomName === '' ? PUBLIC_WAITING_ROOM : roomName;
-    socket.to(room).emit('updateChat',username, chatMessage);
+    if(roomName === ''){
+      socket.to(PUBLIC_WAITING_ROOM).emit('updatePublicChat',username, chatMessage);
+    }
+    else{
+      socket.to(roomName).emit('updatePrivateChat',username, chatMessage);
+    }
+    
   })
   socket.on("disconnect", () => {
     if(socket.username != null){

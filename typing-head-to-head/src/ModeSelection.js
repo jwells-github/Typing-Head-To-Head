@@ -63,6 +63,8 @@ class ModeSelection extends Component {
             <Chatbox 
               socket={this.props.socket}
               username={this.props.username}
+              chatMessages = {this.props.chatMessages}
+              updateChat ={(username,chatMessage) =>this.props.updateChat(username,chatMessage)}
               roomName={''} // Empty string signifies public room
             />
           </div>

@@ -13,12 +13,29 @@ class App extends Component {
       socket: socketIOClient(),
       username: '',
       soloGame: false,
-      privateGame: false,
       privateRoom: '',
       gameMatched:false,
       gameData: {},
-      playersInRoom: 0,
+      playersInPublicRoom: 0, 
+      publicChatHistory : [],
+      privateChatHistory: []
     }
+  }
+  updatePublicChat(username,chatMessage){
+    this.setState({
+      publicChatHistory : this.state.publicChatHistory.concat(this.createChatMessage(username,chatMessage))
+    });
+  }
+  updatePrivateChat(username,chatMessage){
+    this.setState({
+      privateChatHistory : this.state.privateChatHistory.concat(this.createChatMessage(username,chatMessage))
+    });
+  }
+  createChatMessage(username, chatMessage){
+    return         <li key={username+Date.now()}>
+      <span className="chatUsername">{username}:</span>
+      <span className="chatMessage">{chatMessage}</span>
+    </li>
   }
   componentDidMount(){
     this.state.socket.on('gameReady', function(gameData){
@@ -28,13 +45,21 @@ class App extends Component {
       })
     }.bind(this))
     this.state.socket.on('publicRoomSize', function(size){
-      this.setState({playersInRoom : size})
+      this.setState({playersInPublicRoom : size})
+    }.bind(this))
+    this.state.socket.on('updatePublicChat', function(username, chatMessage){
+      console.log('public')
+      this.updatePublicChat(username, chatMessage);
+    }.bind(this))
+    this.state.socket.on('updatePrivateChat', function(username, chatMessage){
+      console.log('private')
+      this.updatePrivateChat(username, chatMessage);
     }.bind(this))
   }
 
   findGame(){
     this.setState({gameMatched: false})
-    this.state.socket.emit('matchmakeMe', '')
+    this.state.socket.emit('matchmakeMe', this.state.privateRoom)
   }
 
   findSoloGame(){
@@ -46,26 +71,19 @@ class App extends Component {
     this.state.socket.emit('joinPrivateRoom', room)
     this.setState({
       gameMatched: false,
-      privateGame: true,
       privateRoom: room,
     })
   }
   leavePrivateRoom(room){
     this.state.socket.emit('leavePrivateRoom', room)
-  }
-  findPrivateGame(){  
-    this.state.socket.emit("matchmakeMe", this.state.privateRoom);
-  }
-
-  leaveGame(){  
-    if(this.state.privateRoom !== ''){
-      this.state.socket.emit('leavePrivateRoom', this.state.privateRoom)
-    }
     this.setState({
-      //searchingForGame: false,
-      soloGame: false,
-      privateGame: false,
       privateRoom: '',
+      privateChatHistory: []
+    })
+  }
+  leaveGame(){  
+    this.setState({
+      soloGame: false,
       gameMatched:false,
       words: []
     })
@@ -73,9 +91,6 @@ class App extends Component {
   playAgain(){
     if(this.state.soloGame){
       this.state.socket.emit("soloGame")
-    }
-    else if(this.state.privateGame){
-      this.findPrivateGame(this.state.privateRoom)
     }
     else{
       this.findGame()
@@ -99,21 +114,21 @@ class App extends Component {
             username={this.state.username}
             gameData={this.state.gameData} 
             socket={this.state.socket}
-            leaveGame={()=>this.leaveGame()}  
-            />
+            leaveGame={()=>this.leaveGame()}  />
         </div>
       )
     }
     else{
-      if(this.state.privateGame){
+      if(this.state.privateRoom !== ''){
         return(
           <PrivateRoom
             socket = {this.state.socket}
             username = {this.state.username}
             privateRoom = {this.state.privateRoom}
-            findPrivateGame = {()=>this.findPrivateGame()}
-            leaveGame = {()=>this.leaveGame()}
-          />
+            findPrivateGame = {()=>this.findGame()}
+            leaveRoom = {()=>this.leavePrivateRoom()}
+            chatMessages ={this.state.privateChatHistory}
+            updateChat ={(username,chatMessage) => this.updatePrivateChat(username,chatMessage)}/>
         )
       }
       return (
@@ -121,10 +136,13 @@ class App extends Component {
           <ModeSelection 
             socket={this.state.socket}
             username = {this.state.username}
-            playersInRoom ={this.state.playersInRoom}
+            playersInPublicRoom ={this.state.playersInPublicRoom}
             findGame ={()=>this.findGame()}
             findSoloGame={()=>this.findSoloGame()}
-            joinPrivateRoom={(room)=>this.joinPrivateRoom(room)}/>
+            joinPrivateRoom={(room)=>this.joinPrivateRoom(room)}
+            chatMessages={this.state.publicChatHistory}
+            updateChat ={(username,chatMessage) => this.updatePublicChat(username,chatMessage)}
+            />
         </div>
       )
     }
