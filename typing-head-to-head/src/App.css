@@ -147,6 +147,7 @@
 
 }
 .typingProgress ul{
+  padding: 0 1.5em;
   margin-bottom:.5em;
 }
 .passageTitle{
