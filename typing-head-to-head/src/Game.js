@@ -2,11 +2,11 @@ import React, {Component} from 'react'
 import './App.css';
 import Player from './Player';
 import GameInput from './GameInput';
+import GameTimer from './GameTimer';
 
 const avgCharactersInWord = 5;
 
 class Game extends Component {
-  _isMounted = false;
   constructor(props){
     super(props);
     this.state = {
@@ -25,7 +25,6 @@ class Game extends Component {
   }
 
   componentDidMount(){
-    this._isMounted = true;
     this.props.socket.on('updateOpponentPosition', function(position){
       this.setState({opponentPosition : position})
     }.bind(this))
@@ -35,26 +34,22 @@ class Game extends Component {
       if(!this.props.soloGame){
         this.props.socket.emit('raceStats', this.calculateWPM(this.state.playerPosition), isWinner)
       }
-      if(this._isMounted){
-        this.setState({
-          typingFinished: true, 
-          raceWinner : isWinner,
-          opponentPosition: isWinner ? this.state.opponentPosition : this._words.length,
-          playerWPM: this.calculateWPM(this.state.playerPosition),
-          opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this._words.length)
-        })
-      }
+      this.setState({
+        typingFinished: true, 
+        raceWinner : isWinner,
+        opponentPosition: isWinner ? this.state.opponentPosition : this._words.length,
+        playerWPM: this.calculateWPM(this.state.playerPosition),
+        opponentWPM: this.calculateWPM(isWinner ? this.state.opponentPosition : this._words.length)
+      })  
     }.bind(this))
     this.props.socket.on('countdown', function(time){
       let gameStarted = time < 1
-      if(this._isMounted){
         this.setState(
-          {
-            gameCountDown : time,
-            gameStarted: gameStarted,
-            typingStartTime : Date.now()
-          });
-      }
+        {
+          gameCountDown : time,
+          gameStarted: gameStarted,
+          typingStartTime : Date.now()
+        });
       if(gameStarted){
         this.timer = setInterval(() => {
           if(this.state.typingFinished){
@@ -73,7 +68,6 @@ class Game extends Component {
 
   componentWillUnmount(){
     clearInterval(this.timer)
-    this._isMounted = false;
     this.props.socket.off('updateOpponentPosition');
     this.props.socket.off('endRace');
     this.props.socket.off('countdown');
@@ -149,13 +143,12 @@ class Game extends Component {
     this._opponentData = this.props.gameData.playerOne.id !== this.props.socket.id ? this.props.gameData.playerOne : this.props.gameData.playerTwo;
     this._passageTitle = this.props.gameData.passage.title;
 
-    let topDisplay = <h1>{this.displayMinutesAndSeconds(this.state.typingTimer)}</h1>;
-    if(!this.state.gameStarted){
-      topDisplay = <h1>Game starting in {this.state.gameCountDown}  </h1>
-    }
     return (
       <div className="Game">
-        {topDisplay}
+        <GameTimer
+          gameStarted = {this.state.gameStarted}
+          gameCountDown = {this.state.gameCountDown}
+          typingTime = {this.state.typingTimer}/>
         <div className="players">
           <div className="playerOne">
             <Player 
