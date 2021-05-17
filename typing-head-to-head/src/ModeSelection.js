@@ -35,14 +35,10 @@ class ModeSelection extends Component {
   }
 
   isIllegalRoomName(room){
-    var matchesPublicWaitingRoom = /\bpublicWaitingRoom\b/.test(room)
-    var matchesMatchmaking = /-MATCHMAKING$/.test(room)
-    if(matchesPublicWaitingRoom || matchesMatchmaking){
-      return true;
-    }
-    else{
-      return false;
-    }
+    var matchesPublicWaitingRoom = /\bpublicWaitingRoom\b/.test(room);
+    // -MATCHMAKING is appended to a user's room when they enter machmaking
+    var matchesMatchmaking = /-MATCHMAKING$/.test(room);
+    return matchesPublicWaitingRoom || matchesMatchmaking;
   }
 
   render(){
