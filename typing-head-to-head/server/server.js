@@ -22,7 +22,7 @@ io.on('connection', (socket) => {
   })
   // A user in a race completes a word
   socket.on('wordComplete', (currentPosition) =>{
-    socket.to(socket.room).emit('updateOpponentPosition',currentPosition)
+    socket.to(socket.gameRoom).emit('updateOpponentPosition',currentPosition)
   })
   // A user in a race completes all their words
   socket.on('raceComplete', () => {
@@ -101,7 +101,7 @@ async function matchUsers(room){
     return
   }
   let playerOne = sockets[0];
-  let playerTwo = sockets[1]
+  let playerTwo = sockets[1];
   // Remove the players from the queue
   playerOne.leave(room);
   playerTwo.leave(room);
@@ -109,6 +109,8 @@ async function matchUsers(room){
   let gameRoom = playerOne.id + "_" + playerTwo.id;
   playerOne.join(gameRoom);
   playerTwo.join(gameRoom);
+  playerOne.gameRoom = gameRoom;
+  playerTwo.gameRoom = gameRoom;
 
   let gameData = {
     playerOne: {
