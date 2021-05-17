@@ -3,6 +3,7 @@ import React, {Component} from 'react'
 class ChatBox extends Component {
 
   componentDidUpdate(){
+    // Scroll chat to bottom
     var chat = document.getElementById("chatMessages");
     chat.scrollTop = chat.scrollHeight;
   }
@@ -13,9 +14,11 @@ class ChatBox extends Component {
     if(chatMessage === ''){
       return;
     }
+    // append message to chat
     this.props.updateChat(this.props.username,chatMessage)
-    document.getElementById('chatInput').value = ""
+    // broadcast message to other users
     this.props.socket.emit('sendChatMessage',this.props.username, chatMessage, this.props.roomName)
+    document.getElementById('chatInput').value = ""
   }
   
   render(){
