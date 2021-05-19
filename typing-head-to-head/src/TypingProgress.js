@@ -6,10 +6,12 @@ class TypingProgress extends Component {
     for(var i = 0; i < this.props.words.length; i++){
       let itemClass = "word "
       if(i < this.props.progress ){
-        itemClass += "completedWord"
+        itemClass += this.props.opponent ? "opponentCompletedWord" : "playerCompletedWord"
       }
       else if(i === this.props.progress && !this.props.opponent){
-        itemClass += "currentWord"
+        if(!this.props.opponent){
+          itemClass += "currentWord"
+        }
       }
       wordList.push(<li className={itemClass} key={i}>{this.props.words[i]}</li>)
     }

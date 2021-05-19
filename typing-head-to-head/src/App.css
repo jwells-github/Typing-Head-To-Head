@@ -106,8 +106,11 @@
   padding:4px;
 }
 
-.completedWord{
-  color:greenyellow
+.playerCompletedWord{
+  color:#0eb502
+}
+.opponentCompletedWord{
+  color: blue;
 }
 
 .currentWord{
