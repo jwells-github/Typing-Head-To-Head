@@ -114,11 +114,6 @@ class Game extends Component {
       event.target.style.background = "white"
     }
   }
-  displayMinutesAndSeconds(timer){
-    let minutes = Math.floor(timer / 60000);
-    let seconds = ((timer % 60000) / 1000).toFixed(0);
-    return (seconds === 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
-  }
 
   playAgain(){
     this.setState({
@@ -148,7 +143,7 @@ class Game extends Component {
         <GameTimer
           gameStarted = {this.state.gameStarted}
           gameCountDown = {this.state.gameCountDown}
-          typingTime = {this.state.typingTimer}/>
+          typingTimer = {this.state.typingTimer}/>
         <div className="players">
           <div className="playerOne">
             <Player 
