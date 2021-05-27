@@ -10,6 +10,13 @@ const PUBLIC_WAITING_ROOM = 'publicWaitingRoom'
 const MATCHMAKING_ROOM_SUFFIX = '-MATCHMAKING';
 let numberOfUsersInPublicRoom;
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 io.on('connection', (socket) => { 
   socket.wins = 0;
   socket.losses = 0;
