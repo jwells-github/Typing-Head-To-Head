@@ -1,15 +1,23 @@
 import React, {Component} from 'react'
 
+const MAX_USERNAME_LENGTH = 12
 class WelcomePage extends Component {
 
   setUsername(event){
     event.preventDefault();
     let usernameInput = document.getElementById("username").value.trim();
-    if(usernameInput === ""){
+    if(usernameInput === "" || usernameInput.length > MAX_USERNAME_LENGTH){
       return;
     }
     this.props.storeUsername(usernameInput)
     this.props.socket.emit("setUsername", usernameInput);
+  }
+
+  checkUsernameLength(event){
+
+    if(event.target.value.length > MAX_USERNAME_LENGTH){
+      event.target.value = event.target.value.substring(0,MAX_USERNAME_LENGTH)
+    }
   }
 
   render(){
@@ -20,7 +28,7 @@ class WelcomePage extends Component {
       <p>Enter a username to play!</p>
       <div>
         <form onSubmit={this.setUsername.bind(this)}>
-          <input id='username' placeholder="Your username"></input>
+          <input id='username' placeholder="Your username" onInput={this.checkUsernameLength.bind(this)}></input>
           <button type="submit">Enter</button>
         </form>
       </div>
