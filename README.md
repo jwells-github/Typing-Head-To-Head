@@ -1,6 +1,6 @@
 # Typing-Head-To-Head
 
-[View this project live on Heroku](https://typing-head-to-head.herokuapp.com/) Multiplayer functionality can be demoed by opening the webpage in two different browser tabs if no other players are available. 
+[View this project live on Heroku!](https://typing-head-to-head.herokuapp.com/) Multiplayer functionality can be demoed by opening the webpage in two different browser tabs if no other players are available. 
 
 Typing-Head-To-Head is a web app that allows players to compete against each other in one versus one typing races
 
