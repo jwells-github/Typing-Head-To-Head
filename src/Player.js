@@ -1,18 +1,20 @@
 import React, {Component} from 'react'
+import { isElementOfType } from 'react-dom/cjs/react-dom-test-utils.production.min';
 import TypingProgress from './TypingProgress';
 
 class Player extends Component {  
   render(){
-    if(this.props.soloGame){
+    if(this.props.soloGame && this.props.opponent){
       return(<div></div>)
     }
+    let usernameAppend = this.props.soloGame ? '' : (this.props.opponent ? '' : '(You)')
     let  passageTitle = <div>
       <span className="passageTitle">This was a passage from {this.props.passageTitle}</span>
     </div>
     return(
       <div>
         <div>
-          <h2>{this.props.username}</h2>
+          <h2>{this.props.username} {usernameAppend}</h2>
           <div className="playerStatistics">
             <span>{this.props.winLoss}</span>
             <span>Record WPM {this.props.recordWPM}</span>

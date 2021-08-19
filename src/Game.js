@@ -156,8 +156,9 @@ class Game extends Component {
               words={this._words}
               passageTitle = {this._passageTitle}
               typingFinished = {this.state.typingFinished}
+              soloGame={this.props.soloGame}
               />
-            <div>
+            <div className="gameInput">
               <GameInput
                 typingFinished={this.state.typingFinished}
                 raceWinner={this.state.raceWinner}
