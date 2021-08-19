@@ -32,11 +32,9 @@ class App extends Component {
       this.setState({playersInPublicRoom : size})
     }.bind(this))
     this.state.socket.on('updatePublicChat', function(username, chatMessage){
-      console.log('public')
       this.updatePublicChat(username, chatMessage);
     }.bind(this))
     this.state.socket.on('updatePrivateChat', function(username, chatMessage){
-      console.log('private')
       this.updatePrivateChat(username, chatMessage);
     }.bind(this))
   }
