@@ -9,6 +9,11 @@ body{
   background:white;
 }
 
+h1, h2{
+  display:inline-block;
+  background:white;
+}
+
 .errorMessage{
   color: red;
 }
