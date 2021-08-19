@@ -44,8 +44,12 @@ class ModeSelection extends Component {
   render(){
     return(  
       <div>
-        <h1>Typing Head-To-Head</h1>
-        <h2>{this.props.playersInPublicRoom} {this.props.playersInPublicRoom === 1 ? 'user' : 'users'} connected</h2>
+        <div>
+          <h1>Typing Head-To-Head</h1>
+        </div>
+        <div>
+          <h2>{this.props.playersInPublicRoom} {this.props.playersInPublicRoom === 1 ? 'user' : 'users'} connected</h2>
+        </div>
         <div className="gameModes">
           <div className="gameMode">
             <h2>Public Head-To-Head</h2>
