@@ -40,6 +40,9 @@ io.on('connection', (socket) => {
     isRaceWinner ? socket.wins++ : socket.losses++
   })
   socket.on('joinPrivateRoom', (privateRoom) =>{
+    if(isIllegalRoomName(privateRoom)){
+      return;
+    }
     socket.leave(PUBLIC_WAITING_ROOM);
     socket.leave(PUBLIC_WAITING_ROOM+MATCHMAKING_ROOM_SUFFIX)
     socket.join(privateRoom);
@@ -134,6 +137,13 @@ async function matchUsers(room){
     }
   }
   startGame(gameRoom, gameData)
+}
+
+function isIllegalRoomName(room){
+  var matchesPublicWaitingRoom = /\bpublicWaitingRoom\b/.test(room);
+  // -MATCHMAKING is appended to a user's room when they enter machmaking
+  var matchesMatchmaking = /-MATCHMAKING$/.test(room);
+  return matchesPublicWaitingRoom || matchesMatchmaking;
 }
 
 async function startGame(gameRoom, gameData){
