@@ -149,6 +149,7 @@ h1, h2{
   max-width: 40vw;
   border:1px dotted black;
   padding: 1em 0 2em;
+  min-width: 355px;
 }
 .playerStatistics{
   display: flex;
