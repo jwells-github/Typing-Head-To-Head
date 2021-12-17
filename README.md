@@ -12,8 +12,21 @@ Once a player has chosen a mode and has been matched into a game they are shown 
 
 Players are also able to type messages to each other in a public chat room, or in a private game room.
 
+## Running Typing Head-To-Head locally
+1. Clone the repo to your local machine
+2. Open package.json and change scripts: start from "cd server && node server.js" to "react-scripts start"
+3. Run 'node server.js' from within the Typing-Head-To-Head/server/ directory
+4. In a separate terminal run 'npm start' from within the /Typing-Head-To-Head/ directory
 ## Built with
 
 - Front end created using [React](https://reactjs.org/)  
 - Back end created using [Express](https://expressjs.com/) (A web framework for [Node.js](https://nodejs.org/en/))
 - [Socket.IO](https://socket.io/) for real time communication between the user and the server
+
+## Images
+### Multiplayer typing game
+![Multiplayer game](README-IMAGES/player_vs_player.png?raw=true "Multiplayer Game")
+### Mode selection screen with chat
+![Mode selection screen](README-IMAGES/selection_menu.png?raw=true "Mode selection screen with chat")
+### Solo typing game
+![Mode selection screen](README-IMAGES/solo_game.png?raw=true "Solo Game")
