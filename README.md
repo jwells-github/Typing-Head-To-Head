@@ -14,8 +14,7 @@ Players are also able to type messages to each other in a public chat room, or i
 
 ## Running Typing Head-To-Head locally
 1. Clone the repo to your local machine
-3. Run 'node server.js' from within the Typing-Head-To-Head/server/ directory
-4. In a separate terminal run 'npm run start-local' from within the /Typing-Head-To-Head/ directory
+2. run 'npm run start-local' from within the /Typing-Head-To-Head/ directory
 ## Built with
 
 - Front end created using [React](https://reactjs.org/)  
