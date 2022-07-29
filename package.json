@@ -4,13 +4,12 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.10",
-    "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
     "express": "^4.17.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "socket.io": "^4.0.1",
+    "socket.io": "^4.5.1",
     "socket.io-client": "^4.0.1",
     "web-vitals": "^1.1.1"
   },
@@ -39,5 +38,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:8080",
+  "devDependencies": {
+    "@testing-library/react": "^11.2.7"
+  }
 }

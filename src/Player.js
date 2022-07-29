@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import { isElementOfType } from 'react-dom/cjs/react-dom-test-utils.production.min';
 import TypingProgress from './TypingProgress';
 
 class Player extends Component {  
@@ -23,7 +22,7 @@ class Player extends Component {
         </div>
           <div className="typingProgress">
             <TypingProgress opponent={this.props.opponent} words={this.props.words} progress={this.props.progress}/>
-            {this.props.typingFinished && !this.props.soloGame ? passageTitle : ''}
+            {this.props.typingFinished  ? passageTitle : ''}
           </div>
       </div>
     )
