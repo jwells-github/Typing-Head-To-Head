@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import Player from '../Player';
 
 test('Player will return an empty div when soloGame and opponent are true', () => {
